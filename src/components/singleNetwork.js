@@ -3,9 +3,9 @@ import { StakingContext } from '@/Context/StakeContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAccount } from 'wagmi';
 import { Loading } from './Loading';
-import { ethers } from 'ethers';
 import stakingAbi2 from '@/Contract/stakingAbi2.json';
 import approveAbi from '@/Contract/approve.json';
+import { ethers } from 'ethers';
 
 
 
@@ -35,23 +35,23 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
 
 
-      async function getContract() {
-      try {
-         const provider = new ethers.providers.Web3Provider(window.ethereum);
-         const signer = provider.getSigner();
+   //    async function getContract() {
+   //    try {
+   //       const provider = new ethers.providers.Web3Provider(window.ethereum);
+   //       const signer = provider.getSigner();
 
-         const contractInstance = new ethers.Contract(
-            shibAddress,
-            stakingAbi2,
-            signer
-         );
+   //       const contractInstance = new ethers.Contract(
+   //          shibAddress,
+   //          stakingAbi2,
+   //          signer
+   //       );
 
-         return contractInstance;
-      } catch (error) {
-         console.error('Error getting approval contract:', error);
-         throw error;
-      }
-   }
+   //       return contractInstance;
+   //    } catch (error) {
+   //       console.error('Error getting approval contract:', error);
+   //       throw error;
+   //    }
+   // }
 
       const getNetworkByAddress = (shibAddress) => {
    return createdShibbase.find(network => network.shibAddress === shibAddress);
@@ -63,8 +63,8 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
       ///// CLAIM F(x) ///////////
    const Claim = async () => {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+         const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
       const contract = new ethers.Contract(
          shibAddress,
          stakingAbi2,
@@ -102,7 +102,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
             setProfitLoading(true);
             tx = await contract.unStake(0, {
                gasLimit: 1000000,
-               gasPrice: ethers.utils.parseUnits('15.0', 'gwei'),
+               gasPrice: ethers.parseUnits('15.0', 'gwei'),
             });
             const receipt = await tx.wait();
             if (receipt.status == 1) {
@@ -138,11 +138,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
             });
             return;
          }
-         // const provider = new ethers.providers.Web3Provider(window.ethereum);
-              const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
-
-         const provider = new ethers.getDefaultProvider();
-         const signer = provider.getSigner();
+         
+         const provider = new ethers.BrowserProvider(window.ethereum);
+    
+         const signer = await provider.getSigner();
 
          const contractInstance = new ethers.Contract(
             token,
@@ -152,7 +151,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
          const balance = await contractInstance.balanceOf(address);
 
-         const stringBalance = ethers.utils.formatEther(balance.toString());
+         const stringBalance = ethers.formatEther(balance.toString());
 
          const formattedBalance = parseFloat(stringBalance).toFixed(3);
 
@@ -173,16 +172,13 @@ const SingleNetwork = ({ shibAddress, token }) => {
       try {
          // const contract = await getContract();
 
-         const provider = new ethers.providers.Web3Provider(window.ethereum);
-         const signer = provider.getSigner();
+         const provider = new ethers.BrowserProvider(window.ethereum);
+         const signer = await provider.getSigner();
          const createdShibbaseInstance = new ethers.Contract(
             shibAddress,
             stakingAbi2,
             signer
-         );
-
-         console.log(shibAddress)
-   
+         );   
 
          if (address === undefined) {
             toast.success(`Please Connect Your Wallet.`, {
@@ -196,14 +192,14 @@ const SingleNetwork = ({ shibAddress, token }) => {
             });
             return;
          }
-         const _amount = ethers.utils.parseEther(stakeAmount, 'ether');
+         const _amount = ethers.parseEther(stakeAmount, 'ether');
 
          const stringAmount = _amount.toString();
       
 
          const tx = await createdShibbaseInstance.stake(stringAmount, {
             gasLimit:7000000,
-            gasPrice: ethers.utils.parseUnits('15.0', 'gwei'),
+            gasPrice: ethers.parseUnits('15.0', 'gwei'),
 
          });
 
@@ -232,8 +228,8 @@ const SingleNetwork = ({ shibAddress, token }) => {
       const UnStake = async () => {
       try {
          setUnStakeLoading(true);
-         const provider = new ethers.providers.Web3Provider(window.ethereum);
-         const signer = provider.getSigner();
+         const provider = new ethers.BrowserProvider(window.ethereum);
+         const signer = await provider.getSigner();
 
          const contract = new ethers.Contract(
             shibAddress,
@@ -256,7 +252,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
             return;
          }
 
-         const _amount = ethers.utils.parseEther(stakeAmount, 'ether');
+         const _amount = ethers.parseEther(stakeAmount, 'ether');
 
          const stringAmount = _amount.toString();
 
@@ -264,7 +260,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
    
          tx = await contract.unStake(stringAmount, {
             gasLimit: 2000000,
-            gasPrice: ethers.utils.parseUnits('15.0', 'gwei'),
+            gasPrice: ethers.parseUnits('15.0', 'gwei'),
          });
          const receipt = await tx.wait();
          if (receipt.status == 1) {
@@ -303,11 +299,9 @@ const SingleNetwork = ({ shibAddress, token }) => {
       }
 
       try {
-         // const provider = new ethers.providers.Web3Provider(window.ethereum);
-                  const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
+         const provider = new ethers.BrowserProvider(window.ethereum);
 
-         const provider = new ethers.getDefaultProvider(alchemyApiKey);
-         const signer = provider.getSigner();
+         const signer = await provider.getSigner();
 
          // const instanceContract = getContract();
 
@@ -319,7 +313,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
          //////////////////////////////
          const balance = await contractInstance.balanceOf(address);
-         const stringBalance = ethers.utils.formatEther(balance.toString());
+         const stringBalance = ethers.formatEther(balance.toString());
          const formattedBalance = parseFloat(stringBalance).toFixed(3);
          console.log(formattedBalance)
          
@@ -346,7 +340,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
          }
 
          // Convert the input stakeAmount to Ether
-         const _amount = ethers.utils.parseEther(stakeAmount, 'ether');
+         const _amount = ethers.parseEther(stakeAmount, 'ether');
          const amountToString = _amount.toString();
 
          let tx;
@@ -356,7 +350,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
             amountToString,
             {
                gasLimit: 5000000,
-               gasPrice: ethers.utils.parseUnits('15', 'gwei'),
+               gasPrice: ethers.parseUnits('15', 'gwei'),
             }
          );
 
