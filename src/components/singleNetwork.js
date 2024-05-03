@@ -138,7 +138,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
             });
             return;
          }
-         const provider = new ethers.providers.Web3Provider(window.ethereum);
+         // const provider = new ethers.providers.Web3Provider(window.ethereum);
+              const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
+
+         const provider = new ethers.getDefaultProvider();
          const signer = provider.getSigner();
 
          const contractInstance = new ethers.Contract(
@@ -300,7 +303,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
       }
 
       try {
-         const provider = new ethers.providers.Web3Provider(window.ethereum);
+         // const provider = new ethers.providers.Web3Provider(window.ethereum);
+                  const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
+
+         const provider = new ethers.getDefaultProvider(alchemyApiKey);
          const signer = provider.getSigner();
 
          // const instanceContract = getContract();
@@ -367,6 +373,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
       } catch (error) {
          console.error(error);
 
+         setApprovedLoading(false);
          if (error.code === 4001) {
             // User cancelled the transaction, set loading to false
             setApprovedLoading(false);
@@ -376,6 +383,8 @@ const SingleNetwork = ({ shibAddress, token }) => {
          }
          setApprovedLoading(false);
       }
+         setApprovedLoading(false);
+
 
    };
 

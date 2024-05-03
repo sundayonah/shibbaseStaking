@@ -22,9 +22,17 @@ export const StakingContextProvider = ({ children }) => {
 
    useEffect(() => {
       const fetchFactory = async () => {
+         try {
+            
+ 
+            const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
 
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-         const signer = provider.getSigner();
+         const provider = new ethers.getDefaultProvider(alchemyApiKey);
+         // const provider = new ethers.AlchemyProvider(window.ethereum);
+
+
+         // const provider = new ethers.getDefaultProvider(network = "base-sepolia", alchemyApiKey);
+         // const signer = provider.getSigner();
          const contractInstance = new ethers.Contract(
             factoryContractAddress,
             factoryAbi,
@@ -42,10 +50,10 @@ export const StakingContextProvider = ({ children }) => {
 
             ////////////
                const aprInSmallestUnits = await createdShibbase4Address.RATE();
-               const apr = ethers.utils.formatEther(aprInSmallestUnits);
+               const apr = ethers.formatEther(aprInSmallestUnits);
 
                const totalStake = await createdShibbase4Address.totalStaking();
-               const formatStake = ethers.utils.formatEther(totalStake.toString())
+               const formatStake = ethers.formatEther(totalStake.toString())
 
 
                const totalStaker = await createdShibbase4Address.totalStaker();
@@ -54,13 +62,13 @@ export const StakingContextProvider = ({ children }) => {
 
             // Fetch the required data from the ERC20 contrac
             const tokens = await createdShibbase4Address.token();
-            // console.log(tokens)
 
             const erc20Tokens = new ethers.Contract(tokens, erc20Abi, provider);
             // console.log(erc20Tokens)
             
                   // const balanceOf = await erc20Tokens.balanceOf(signer.getAddress());
-                  const name = await erc20Tokens.name();
+            const name = await erc20Tokens.name();
+
             const symbol = await erc20Tokens.symbol();
          
             
@@ -76,6 +84,12 @@ export const StakingContextProvider = ({ children }) => {
         });
             setCreatedShibbase(networkDetails)
                      }
+                  
+                    
+         } catch (error) {
+            console.error('Error failed fetching data:', error);
+                    
+                 }
       }
       fetchFactory()
    },[])
