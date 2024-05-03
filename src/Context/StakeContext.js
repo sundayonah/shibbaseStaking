@@ -18,27 +18,27 @@ export const StakingContextProvider = ({ children }) => {
 
    /// state variables
    const [createdShibbase, setCreatedShibbase] = useState([]);
+     const [isLoading, setIsLoading] = useState(true);
+
 
 
    useEffect(() => {
       const fetchFactory = async () => {
+                    setIsLoading(true)
+
          try {
             
  
             const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
 
          const provider = new ethers.getDefaultProvider(alchemyApiKey);
-         // const provider = new ethers.AlchemyProvider(window.ethereum);
-
-
-         // const provider = new ethers.getDefaultProvider(network = "base-sepolia", alchemyApiKey);
-         // const signer = provider.getSigner();
+   
          const contractInstance = new ethers.Contract(
             factoryContractAddress,
             factoryAbi,
             provider
          );
-         // console.log(contractInstance)
+
          const getAllCreatedShibbase = await contractInstance.getAllCreatedShibbase()
 
          const networkDetails = [];
@@ -85,7 +85,7 @@ export const StakingContextProvider = ({ children }) => {
             setCreatedShibbase(networkDetails)
                      }
                   
-                    
+                    setIsLoading(false)
          } catch (error) {
             console.error('Error failed fetching data:', error);
                     
@@ -98,6 +98,7 @@ export const StakingContextProvider = ({ children }) => {
    return (
       <StakingContext.Provider
          value={{
+            isLoading,
             createdShibbase,
          }}
       >

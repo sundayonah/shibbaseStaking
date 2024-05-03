@@ -1,13 +1,27 @@
 import Link from "next/link";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { StakingContext } from "@/Context/StakeContext";
+import { Loading } from "./Loading";
 
 const NetworkList = () => {
+    // const [isLoading, setIsLoading] = useState(true);
+
 
   const {
-       createdShibbase
+       createdShibbase,isLoading
   } = useContext(StakingContext);
 
+// Conditional rendering based on loading state
+  if (isLoading) {
+    return (
+      <div className="mt-64">
+     <div className="flex items-center justify-center">
+
+            <div  className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white" />
+</div>
+      </div>
+    );
+  }
   
  return (
     <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mt-32">
