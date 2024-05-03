@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+   color: #fff;
+   background: linear-gradient(to right, #000f58, #000624);
+}
+/* 
+.bgimage {
+   background-image: url('/monie.jpg');
+   background-size: cover;
+   background-position: center;
+   height: 100vh;
+   opacity: 0.25;
+   z-index: 0;
+} */
+
+/* backgroundImage: {
+        'hero-pattern': "url('/img/hero-pattern.svg')",
+        'footer-texture': "url('/img/footer-texture.png')",
+      } */
+
+/* <div class="bg-[url('/img/hero-pattern.svg')]"> */
