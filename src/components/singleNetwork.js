@@ -3,7 +3,6 @@ import { StakingContext } from '@/Context/StakeContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAccount } from 'wagmi';
 import { Loading } from './Loading';
-import { networkList } from './Networks';
 import { ethers } from 'ethers';
 import stakingAbi2 from '@/Contract/stakingAbi2.json';
 import approveAbi from '@/Contract/approve.json';
