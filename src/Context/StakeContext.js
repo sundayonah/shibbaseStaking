@@ -13,8 +13,8 @@ export const StakingContext = createContext({});
 
 export const StakingContextProvider = ({ children }) => {
    // testnet
-   const factoryContractAddress = "0x0B440864fe9f47da44E45A193012a60dD73d8062"
-   // const factoryContractAddressMainnet = "0xEB5663450e6047AB2307e12B74333714976e6705"
+   // const factoryContractAddress = "0x0B440864fe9f47da44E45A193012a60dD73d8062"
+   const factoryContractAddressMainnet = "0xEB5663450e6047AB2307e12B74333714976e6705"
 
 
    /// state variables
