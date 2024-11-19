@@ -203,8 +203,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
          });
 
-
-
          setStakeAmount('');
 
          const receipt = await tx.wait();

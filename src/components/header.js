@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 const Header = () => {
 
@@ -7,7 +8,7 @@ const Header = () => {
             <div className=" pr-2">
                <Link href='/'>
 
-               <img src="/shibase.png" alt="logo-image" className="h-12 w-10" />
+                  <Image src="/shibase.png" alt="logo-image" className="h-12 w-12" width={150} height={100} />
                </Link>
             </div>
             <div className="flex space-x-5 justify-center items-center">
