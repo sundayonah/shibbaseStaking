@@ -213,11 +213,6 @@ export function CreateStakeModal() {
                   </Button>
                </div>
             </form>
-
-            <div>
-               <h2>Approve Tokens</h2>
-               <button onClick={handleApprove}>Approve</button>
-            </div>
          </DialogContent>
       </Dialog>
    );
