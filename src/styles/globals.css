@@ -22,3 +22,9 @@ body {
       } */
 
 /* <div class="bg-[url('/img/hero-pattern.svg')]"> */
+
+@layer base {
+  :root {
+      --radius: 0.5rem;
+   }
+}

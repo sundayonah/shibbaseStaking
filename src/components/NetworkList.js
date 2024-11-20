@@ -1,50 +1,92 @@
+import { useContext } from "react";
 import Link from "next/link";
-import { useContext, useState } from "react";
+import Image from "next/image";
 import { StakingContext } from "@/Context/StakeContext";
-import { Loading } from "./Loading";
+import CreateStakeModal from "./CreateStakeModal";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Toaster } from "react-hot-toast";
+
+const NetworkCard = ({ network }) => (
+  <Link
+    href={`/singleNetwork?shibAddress=${network.shibAddress}&token=${network.tokens}`}
+    className="block transition-transform hover:scale-105"
+  >
+    <Card className="h-full border-blue-950 bg-gradient-to-br from-slate-900 to-slate-800">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">{network.name}</h3>
+          <Image
+            src="/shibase.png"
+            className="w-8 h-8 rounded-full"
+            width={100}
+            height={100}
+            alt={`${network.name} logo`}
+            priority
+          />
+        </div>
+        <div className="mt-4 space-y-2">
+          <StatsRow label="Total Stake" value={network.totalStake} />
+          <StatsRow label="APR" value={`${network.apr}%`} />
+          <StatsRow label="Total Stakers" value={network.totalStaker} />
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
+);
+
+const StatsRow = ({ label, value }) => (
+  <div className="flex justify-between items-center">
+    <span className="text-sm text-gray-400">{label}</span>
+    <span className="text-sm font-semibold text-white">{value}</span>
+  </div>
+);
+
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center h-64 mt-32">
+    <div className="relative">
+      <div className="w-16 h-16 border-4 border-blue-200 rounded-full animate-spin border-t-blue-500" />
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="w-8 h-8 border-4 border-blue-500 rounded-full animate-ping" />
+      </div>
+    </div>
+  </div>
+);
+
+const EmptyState = () => (
+  <Alert className="max-w-2xl mx-auto bg-slate-900 border-blue-500">
+    <AlertDescription className="text-center py-8">
+      <p className="text-xl text-gray-300 mb-4">No networks have been created yet</p>
+      <p className="text-gray-400">Create your first network using the button above!</p>
+    </AlertDescription>
+  </Alert>
+);
 
 const NetworkList = () => {
-    // const [isLoading, setIsLoading] = useState(true);
+  const { createdShibbase, isLoading } = useContext(StakingContext);
 
-// 
-  const {
-       createdShibbase,isLoading
-  } = useContext(StakingContext);
+  // if (isLoading) {
+  //   return <LoadingSpinner />;
+  // }
 
-// Conditional rendering based on loading state
-  if (isLoading) {
-    return (
-      <div className="mt-64">
-     <div className="flex items-center justify-center">
-
-            <div  className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white" />
-</div>
+  return (
+    <div className="container mx-auto px-4 py-8 mt-32">
+      <Toaster />
+      <div className="flex justify-end mb-8">
+        <CreateStakeModal />
       </div>
-    );
-  }
-  
- return (
-    <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 mt-32">
-      {createdShibbase.map(net => (
-      <Link key={net.shibAddress} href={`/singleNetwork?shibAddress=${net.shibAddress}&token=${net.tokens}`} className="text-xl font-bold text-blue-500 hover:text-blue-700 block">
-              <div className="border border-blue-950  shadow-2xl rounded-md p-4">
-                  <div className="flex justify-between items-center">
-                     {net.name}
-              <img src="/shibase.png" className="w-6 h-6 rounded-full" alt={net.name} />
 
-                  </div>
-          <div className="mt-2">
-            <p className="text-sm text-gray-500">Total Stake: <span className="font-semibold">{net.totalStake}</span></p>
-            <p className="text-sm text-gray-500">APR: <span className="font-semibold">{net.apr}%</span></p>
-            <p className="text-sm text-gray-500">Total Staker: <span className="font-semibold">{net.totalStaker}</span></p>
-          </div>
+      {createdShibbase.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {createdShibbase.map((network) => (
+            <NetworkCard key={network.shibAddress} network={network} />
+          ))}
         </div>
-      </Link>
-      ))}
+      )}
     </div>
- );
+  );
 };
 
 export default NetworkList;
-
-

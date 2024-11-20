@@ -2,17 +2,11 @@ import { StakingContextProvider } from '@/Context/StakeContext';
 import Header from '@/components/header';
 import '@/styles/globals.css';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
+import { createConfig, http } from 'wagmi'
+import { mainnet, baseSepolia } from 'wagmi/chains'
+import { metaMask } from 'wagmi/connectors'
 
 import { WagmiConfig } from 'wagmi';
-import {
-   arbitrum,
-   bsc,
-   bscTestnet,
-   goerli,
-   mainnet,
-   polygon,
-   sepolia,
-} from 'wagmi/chains';
 
 // 1. Get projectId
 const projectId = '60fa83860edbb9d7d2e1df131caa2675';
@@ -26,8 +20,9 @@ const metadata = {
    icons: ['https://avatars.githubusercontent.com/u/37784886'],
 };
 
-const chains = [mainnet, arbitrum, bsc, bscTestnet, polygon, sepolia, goerli];
+const chains = [mainnet, baseSepolia];
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
+
 
 // 3. Create modal
 createWeb3Modal({ wagmiConfig, projectId, chains });

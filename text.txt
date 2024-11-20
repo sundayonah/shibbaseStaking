@@ -1,0 +1,269 @@
+import React, { useState, useContext, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { StakingContext } from '@/Context/StakeContext';
+import { ConvertToEpochDuration } from '@/lib/helper';
+import toast from 'react-hot-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+export function CreateStakeModal() {
+   const {
+      CreateStake,
+      isCreating,
+      isConnected,
+      address,
+      connect,
+   } = useContext(StakingContext);
+
+   const [isOpen, setIsOpen] = useState(false);
+   const [error, setError] = useState(null);
+   const [stakeParams, setStakeParams] = useState({
+      tokenAddress: '',
+      minimumStake: '',
+      apr: '',
+      duration: '',
+   });
+
+   // Clear error when modal closes
+   useEffect(() => {
+      if (!isOpen) {
+         setError(null);
+      }
+   }, [isOpen]);
+
+   // const validateInput = () => {
+   //    if (
+   //       !stakeParams.tokenAddress ||
+   //       !stakeParams.minimumStake ||
+   //       !stakeParams.apr ||
+   //       !stakeParams.duration
+   //    ) {
+   //       setError('All fields are required');
+   //       return false;
+   //    }
+
+   //    if (parseFloat(stakeParams.minimumStake) <= 0) {
+   //       setError('Minimum stake must be greater than 0');
+   //       return false;
+   //    }
+
+   //    if (parseFloat(stakeParams.apr) <= 0) {
+   //       setError('APR must be greater than 0');
+   //       return false;
+   //    }
+
+   //    if (parseInt(stakeParams.duration) <= 0) {
+   //       setError('Duration must be greater than 0');
+   //       return false;
+   //    }
+
+   //    return true;
+   // };
+
+   const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (!isConnected) {
+         try {
+            await connect();
+            return;
+         } catch (error) {
+            toast.error('Failed to connect wallet');
+            return;
+         }
+      }
+
+      if (
+         stakeParams.tokenAddress === '' ||
+         stakeParams.minimumStake === '' ||
+         stakeParams.apr === '' ||
+         stakeParams.duration === ''
+      ) {
+         console.error('All fields are required.');
+         toast.error('Please fill all the fields.');
+         return;
+      }
+
+      try {
+         const result = await CreateStake();
+         if (result.success) {
+            console.log('New Stake Address:', result.stakeAddress);
+            console.log('Transaction Hash:', result.transactionHash);
+
+            // Reset inputs
+            setStakeParams({
+               tokenAddress: '',
+               minimumStake: '',
+               apr: '',
+               duration: '',
+            });
+
+            // Close modal
+            setIsOpen(false);
+         } else {
+            console.error('Stake creation failed:', result.error);
+         }
+      } catch (error) {
+         console.error('Error creating stake:', error);
+      }
+   };
+
+   // // Validate inputs
+   // if (!validateInput()) {
+   //    return;
+   // }
+
+   const getButtonText = () => {
+      if (!isConnected) return 'Connect Wallet';
+      if (isCreating) return 'Creating...';
+      return 'Create Stake';
+   };
+
+   return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+         <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+               Create Stake
+            </Button>
+         </DialogTrigger>
+         <DialogContent className="bg-gradient-to-br from-slate-900 to-slate-800 border-blue-950">
+            <DialogHeader>
+               <DialogTitle className="text-white text-xl font-bold text-center">
+                  Create New Stake Pool
+               </DialogTitle>
+            </DialogHeader>
+
+            {/* {error && (
+               <Alert
+                  variant="destructive"
+                  className="bg-red-900 border-red-800"
+               >
+                  <AlertDescription className="text-white">
+                     {error}
+                  </AlertDescription>
+               </Alert>
+            )} */}
+
+            <form onSubmit={handleSubmit} className="grid gap-4 py-3">
+               <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                     htmlFor="tokenAddress"
+                     className="text-right text-gray-300"
+                  >
+                     Token Address
+                  </Label>
+                  <Input
+                     id="tokenAddress"
+                     placeholder="0x..."
+                     className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                     value={stakeParams.tokenAddress}
+                     onChange={(e) => {
+                        setError(null);
+                        setStakeParams({
+                           ...stakeParams,
+                           tokenAddress: e.target.value,
+                        });
+                     }}
+                     required
+                  />
+               </div>
+
+               <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                     htmlFor="minimumStake"
+                     className="text-right text-gray-300"
+                  >
+                     Minimum Stake
+                  </Label>
+                  <Input
+                     id="minimumStake"
+                     type="number"
+                     placeholder="100"
+                     className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                     value={stakeParams.minimumStake}
+                     onChange={(e) => {
+                        setError(null);
+                        setStakeParams({
+                           ...stakeParams,
+                           minimumStake: e.target.value,
+                        });
+                     }}
+                     required
+                     step="0.01"
+                     min="0"
+                  />
+               </div>
+
+               <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="apr" className="text-right text-gray-300">
+                     APR (%)
+                  </Label>
+                  <Input
+                     id="apr"
+                     type="number"
+                     placeholder="5"
+                     className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                     value={stakeParams.apr}
+                     onChange={(e) => {
+                        setError(null);
+                        setStakeParams({
+                           ...stakeParams,
+                           apr: e.target.value,
+                        });
+                     }}
+                     required
+                     step="0.1"
+                     min="0"
+                  />
+               </div>
+
+               <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                     htmlFor="duration"
+                     className="text-right text-gray-300"
+                  >
+                     Duration (Days)
+                  </Label>
+                  <Input
+                     id="duration"
+                     type="number"
+                     placeholder="30"
+                     className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                     value={stakeParams.duration}
+                     onChange={(e) => {
+                        setError(null);
+                        setStakeParams({
+                           ...stakeParams,
+                           duration: e.target.value,
+                        });
+                     }}
+                     required
+                     min="1"
+                  />
+               </div>
+
+               <div className="flex justify-center space-x-2 mt-4">
+                  <Button
+                     type="submit"
+                     disabled={isCreating}
+                     className="bg-blue-600 hover:bg-blue-700 w-full disabled:opacity-50"
+                  >
+                     {getButtonText()}
+                  </Button>
+               </div>
+            </form>
+         </DialogContent>
+      </Dialog>
+   );
+}
+
+export default CreateStakeModal;
