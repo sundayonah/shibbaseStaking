@@ -86,18 +86,31 @@ export function CreateStakeModal() {
    return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button
+               className="bg-gradient-to-br from-slate-900 to-slate-800 hover:hover:shadow-2xl shadow-xl"
+               data-aos="fade-up"
+               data-aos-duration="3000"
+            >
                Create Stake
             </Button>
          </DialogTrigger>
-         <DialogContent className="bg-gradient-to-br from-slate-900 to-slate-800 border-blue-950">
+         <DialogContent className="bg-gradient-to-br from-slate-900 to-slate-800 border-none shadow-xl">
             <DialogHeader>
-               <DialogTitle className="text-white text-xl font-bold text-center">
+               <DialogTitle
+                  className="text-white text-xl font-bold text-center"
+                  data-aos="fade-up"
+                  data-aos-duration="3000"
+               >
                   Create New Stake Pool
                </DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="grid gap-4 py-3">
+            <form
+               onSubmit={handleSubmit}
+               className="grid gap-4 py-3"
+               data-aos="fade-up"
+               data-aos-duration="3000"
+            >
                <div className="grid grid-cols-4 items-center gap-4">
                   <Label
                      htmlFor="tokenAddress"

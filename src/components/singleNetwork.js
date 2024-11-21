@@ -6,7 +6,9 @@ import { Loading } from './Loading';
 import stakingAbi2 from '@/Contract/stakingAbi2.json';
 import approveAbi from '@/Contract/approve.json';
 import { ethers } from 'ethers';
-
+import Image from 'next/image';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 
 const SingleNetwork = ({ shibAddress, token }) => {
@@ -386,13 +388,14 @@ const SingleNetwork = ({ shibAddress, token }) => {
       }
    };
 
-
-
-
+   // useEffect(() => {
+   //    AOS.init({ duration: 800 });
+   // }, []);
 
 
    return (
-      <div className='container mx-auto mt-48'>
+      <div className='container mx-auto mt-48' data-aos="fade-up"
+         data-aos-duration="3000">
          <h1 className='text-center text-5xl'>{findNetworkDetails?.name}</h1>
          <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[85%] m-auto my-10">
             <Toaster />
@@ -428,7 +431,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
                            alt="image"
                            className="w-5 h-5 rounded-full object-cover"
                         /> */}
-                           <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
+                           <Image src="/shibase.png" className="w-4 h-4 rounded-full" width={100} height={100} alt="image name" />
 
                            <span className="pl-1 text-gray-500">{findNetworkDetails?.symbol}</span>
                         </div>
@@ -482,7 +485,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
                      alt="image"
                      className="w-5 h-5 rounded-full object-cover"
                   /> */}
-                     <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
+                     <Image src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" width={100} height={100} />
 
                      <input
                         className="w-full bg-transparent focus:outline-none p-1"
