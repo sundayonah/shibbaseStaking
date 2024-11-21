@@ -64,35 +64,6 @@ export const StakingContextProvider = ({ children }) => {
 
 
 
-   useEffect(() => {
-
-      const fetchFactory = async () => {
-         try {
-
-            const contractInstance = new ethers.Contract(
-               "0x652a6F034bA3aEfF9BDCF2Dd1348299a6E39a1dE",
-               approveAbi,
-               provider
-            );
-
-            const balance = await contractInstance.balanceOf(address);
-            console.log(balance.toString(), "balance")
-
-
-         } catch (error) {
-            console.error('Error fetching factory data:', error);
-            toast.error('Failed to fetch networks');
-         } finally {
-
-         }
-      };
-
-      fetchFactory();
-
-
-   }, []);
-
-
    // Approve Logic
 
 
@@ -313,7 +284,7 @@ export const StakingContextProvider = ({ children }) => {
 
 
    const listenForNewStakes = () => {
-      // const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
 
 
       const factoryContract = new ethers.Contract(
