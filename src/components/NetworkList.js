@@ -6,10 +6,11 @@ import CreateStakeModal from "./CreateStakeModal";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Toaster } from "react-hot-toast";
+import { FormatDateTime } from "@/lib/helper";
 
 const NetworkCard = ({ network }) => (
   <Link
-    href={`/singleNetwork?shibAddress=${network.shibAddress}&token=${network.tokens}`}
+    href={`/singleNetwork?shibAddress=${network.shibaseStake}&token=${network.token}`}
     className="block transition-transform hover:scale-105"
   >
     <Card className="h-full border-blue-950 bg-gradient-to-br from-slate-900 to-slate-800">
@@ -29,6 +30,9 @@ const NetworkCard = ({ network }) => (
           <StatsRow label="Total Stake" value={network.totalStake} />
           <StatsRow label="APR" value={`${network.apr}%`} />
           <StatsRow label="Total Stakers" value={network.totalStaker} />
+          <StatsRow label="Minimum Stake" value={network.min} />
+          <StatsRow label="Duration (Days)" value={FormatDateTime(network.duration)} />
+
         </div>
       </CardContent>
     </Card>
@@ -81,10 +85,11 @@ const NetworkList = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {createdShibbase.map((network) => (
-            <NetworkCard key={network.shibAddress} network={network} />
+            <NetworkCard key={network.shibaseStake} network={network} />
           ))}
         </div>
       )}
+
     </div>
   );
 };

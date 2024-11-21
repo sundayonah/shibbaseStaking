@@ -10,7 +10,7 @@ import { ethers } from 'ethers';
 
 
 const SingleNetwork = ({ shibAddress, token }) => {
-   
+
    const {
       totalStaker,
       totalAmountStake,
@@ -25,11 +25,11 @@ const SingleNetwork = ({ shibAddress, token }) => {
    const [stakeButtonState, setStakeButtonState] = useState('Stake');
    const [stakeLoading, setStakeLoading] = useState(false);
    const [stakeAmount, setStakeAmount] = useState('');
-      const [approvedLoading, setApprovedLoading] = useState(false);
+   const [approvedLoading, setApprovedLoading] = useState(false);
    const [isApproved, setIsApproved] = useState(false);
    const [unStakeLoading, setUnStakeLoading] = useState(false);
    const [maxBalance, setMaxBalance] = useState('');
-      const [noProfitYet, setNoProfitYet] = useState(false);
+   const [noProfitYet, setNoProfitYet] = useState(false);
    const [profitLoading, setProfitLoading] = useState(false);
    const [claimLoading, setClaimLoading] = useState(false);
 
@@ -53,17 +53,17 @@ const SingleNetwork = ({ shibAddress, token }) => {
    //    }
    // }
 
-      const getNetworkByAddress = (shibAddress) => {
-   return createdShibbase.find(network => network.shibAddress === shibAddress);
+   const getNetworkByAddress = (shibAddress) => {
+      return createdShibbase.find(network => network.shibAddress === shibAddress);
    };
 
    const findNetworkByAddress = getNetworkByAddress(shibAddress)
 
 
 
-      ///// CLAIM F(x) ///////////
+   ///// CLAIM F(x) ///////////
    const Claim = async () => {
-         const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(
          shibAddress,
@@ -138,9 +138,9 @@ const SingleNetwork = ({ shibAddress, token }) => {
             });
             return;
          }
-         
+
          const provider = new ethers.BrowserProvider(window.ethereum);
-    
+
          const signer = await provider.getSigner();
 
          const contractInstance = new ethers.Contract(
@@ -178,7 +178,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
             shibAddress,
             stakingAbi2,
             signer
-         );   
+         );
 
          if (address === undefined) {
             toast.success(`Please Connect Your Wallet.`, {
@@ -195,10 +195,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
          const _amount = ethers.parseEther(stakeAmount, 'ether');
 
          const stringAmount = _amount.toString();
-      
+
 
          const tx = await createdShibbaseInstance.stake(stringAmount, {
-            gasLimit:7000000,
+            gasLimit: 7000000,
             gasPrice: ethers.parseUnits('15.0', 'gwei'),
 
          });
@@ -223,7 +223,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
    };
 
    ///////UNSTAKE///////
-      const UnStake = async () => {
+   const UnStake = async () => {
       try {
          setUnStakeLoading(true);
          const provider = new ethers.BrowserProvider(window.ethereum);
@@ -255,7 +255,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
          const stringAmount = _amount.toString();
 
          let tx;
-   
+
          tx = await contract.unStake(stringAmount, {
             gasLimit: 2000000,
             gasPrice: ethers.parseUnits('15.0', 'gwei'),
@@ -277,7 +277,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
       // setStakeLoading(false);
    };
 
-      ///// APPROVE F(x) ///////////
+   ///// APPROVE F(x) ///////////
    const Approved = async () => {
       // console.log('hello approve');
       setApprovedLoading(true);
@@ -314,27 +314,27 @@ const SingleNetwork = ({ shibAddress, token }) => {
          const stringBalance = ethers.formatEther(balance.toString());
          const formattedBalance = parseFloat(stringBalance).toFixed(3);
          console.log(formattedBalance)
-         
+
          // Check if the balance is less than 1 or if the input amount is greater than the balance
          if (parseFloat(formattedBalance) < 1 || parseFloat(stakeAmount) > parseFloat(formattedBalance)) {
-         let errorMessage = '';
-         if (parseFloat(formattedBalance) === 0) {
-            errorMessage = 'Insufficient funds.';
-         } else {
-            errorMessage = `Insufficient funds or input amount exceeds available balance. Please stake at least ${formattedBalance} ${findNetworkByAddress?.symbol}.`;
-         }
+            let errorMessage = '';
+            if (parseFloat(formattedBalance) === 0) {
+               errorMessage = 'Insufficient funds.';
+            } else {
+               errorMessage = `Insufficient funds or input amount exceeds available balance. Please stake at least ${formattedBalance} ${findNetworkByAddress?.symbol}.`;
+            }
 
-         toast.error(errorMessage, {
-            duration: 4000,
-            position: 'top-right',
-            icon: '❌',
-            style: {
-               color: '#fff',
-               background: `linear-gradient(to right, #000f58, #000624)`,
-            },
-         });
-         setApprovedLoading(false);
-         return; // Exit the function early
+            toast.error(errorMessage, {
+               duration: 4000,
+               position: 'top-right',
+               icon: '❌',
+               style: {
+                  color: '#fff',
+                  background: `linear-gradient(to right, #000f58, #000624)`,
+               },
+            });
+            setApprovedLoading(false);
+            return; // Exit the function early
          }
 
          // Convert the input stakeAmount to Ether
@@ -375,12 +375,12 @@ const SingleNetwork = ({ shibAddress, token }) => {
          }
          setApprovedLoading(false);
       }
-         setApprovedLoading(false);
+      setApprovedLoading(false);
 
 
    };
 
- 
+
    const handleButtonAboveClick = (buttonState) => {
       setStakeButtonState(buttonState);
    };
@@ -400,157 +400,155 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
 
 
-   
+
    return (
       <div className='mt-32'>
          <h1 className='text-center text-5xl'>{findNetworkByAddress?.name}</h1>
-      <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[75%] m-auto my-10">
-         <Toaster />
-         {/* left side */}
-         <div className="w-full md:w-[80%] m-auto">
-            <span>Stats</span>
-            <div className="p-9 border border-gray-600 rounded-md ">
-                  <h2>${totalAmountStake} {findNetworkByAddress?.symbol }</h2>
-                  <h6 className="text-sm text-gray-500">Total Staked { findNetworkByAddress?.symbol}</h6>
-               <div className="flex justify-between items-center pt-5">
-                  <span>
-                        <h2>{ findNetworkByAddress?.apr} % Daily</h2>
-                     <span className="text-sm  text-gray-500">APR</span>
-                  </span>
-                  <span className="inline-block h-12 border-r border-solid border-gray-600"></span>
-                  <span>
-                     <h2>{findNetworkByAddress?.totalStaker}</h2>
-                     <span className="text-sm  text-gray-500">
-                        No. of Stakers
+         <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[75%] m-auto my-10">
+            <Toaster />
+            {/* left side */}
+            <div className="w-full md:w-[80%] m-auto">
+               <span>Stats</span>
+               <div className="p-9 border border-gray-600 rounded-md ">
+                  <h2>${totalAmountStake} {findNetworkByAddress?.symbol}</h2>
+                  <h6 className="text-sm text-gray-500">Total Staked {findNetworkByAddress?.symbol}</h6>
+                  <div className="flex justify-between items-center pt-5">
+                     <span>
+                        <h2>{findNetworkByAddress?.apr} % Daily</h2>
+                        <span className="text-sm  text-gray-500">APR</span>
                      </span>
-                  </span>
+                     <span className="inline-block h-12 border-r border-solid border-gray-600"></span>
+                     <span>
+                        <h2>{findNetworkByAddress?.totalStaker}</h2>
+                        <span className="text-sm  text-gray-500">
+                           No. of Stakers
+                        </span>
+                     </span>
+                  </div>
                </div>
-            </div>
-            <div className="mt-10">
-               <span className="">Balances</span>
-               <div className="p-6  border border-gray-600 rounded-md ">
-                  <div className="flex pb-3 justify-between border-b border-gray-600">
-                     <div className="flex justify-center items-center">
-                        {/* <img
+               <div className="mt-10">
+                  <span className="">Balances</span>
+                  <div className="p-6  border border-gray-600 rounded-md ">
+                     <div className="flex pb-3 justify-between border-b border-gray-600">
+                        <div className="flex justify-center items-center">
+                           {/* <img
                            src={findNetworkByAddress?.logo}
                            // width={30}
                            // height={20}
                            alt="image"
                            className="w-5 h-5 rounded-full object-cover"
                         /> */}
-              <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
-                           
+                           <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
+
                            <span className="pl-1 text-gray-500">{findNetworkByAddress?.symbol}</span>
+                        </div>
+                        <p>{ethBalance}</p>
                      </div>
-                     <p>{ethBalance}</p>
-                  </div>
-                  <div className="flex pt-3 justify-between items-center">
-                     <div className=" pb-2 ">
-                        <span className="pl-2">{calculateReward} {findNetworkByAddress?.symbol}</span>
-                        {/* <p>Research</p> */}
+                     <div className="flex pt-3 justify-between items-center">
+                        <div className=" pb-2 ">
+                           <span className="pl-2">{calculateReward} {findNetworkByAddress?.symbol}</span>
+                           {/* <p>Research</p> */}
+                        </div>
+                        <button
+                           onClick={() => Claim()}
+                           className="bg-gradient-to-b from-blue-500 hover:bg-blue-900 py-1 px-2 rounded-md"
+                        >
+                           {claimLoading ? <Loading /> : 'Claim Now'}
+                        </button>
                      </div>
-                     <button
-                        onClick={() => Claim()}
-                        className="bg-gradient-to-b from-blue-500 hover:bg-blue-900 py-1 px-2 rounded-md"
-                     >
-                        {claimLoading ? <Loading /> : 'Claim Now'}
-                     </button>
                   </div>
                </div>
             </div>
-         </div>
-         {/* right side */}
-         <div className="w-full md:w-[80%] m-auto ">
-            <div className="flex justify-center items-center py-7">
-               <button
-                  onClick={() => handleButtonAboveClick('Stake')}
-                  className={` border border-gray-600 px-8 md:px-12 p-2 ${
-                     stakeButtonState === 'Stake'
+            {/* right side */}
+            <div className="w-full md:w-[80%] m-auto ">
+               <div className="flex justify-center items-center py-7">
+                  <button
+                     onClick={() => handleButtonAboveClick('Stake')}
+                     className={` border border-gray-600 px-8 md:px-12 p-2 ${stakeButtonState === 'Stake'
                         ? 'bg-blue-700 hover:bg-blue-600 text-white'
                         : ''
-                  }`}
-               >
-                  Stake
-               </button>
-               <button
-                  onClick={() => handleButtonAboveClick('Unstake')}
-                  className={` border border-gray-600 px-8 md:px-12 p-2 ${
-                     stakeButtonState === 'Unstake'
+                        }`}
+                  >
+                     Stake
+                  </button>
+                  <button
+                     onClick={() => handleButtonAboveClick('Unstake')}
+                     className={` border border-gray-600 px-8 md:px-12 p-2 ${stakeButtonState === 'Unstake'
                         ? 'bg-blue-700 hover:bg-blue-600 text-white'
                         : ''
-                  }`}
-               >
-                  Unstake
-               </button>
-            </div>
-            <div className=" border border-gray-600 rounded-md">
-               <div className="flex justify-between items-center px-4 py-5 ">
-                  <span>Stake</span>
-                  <span>X</span>
+                        }`}
+                  >
+                     Unstake
+                  </button>
                </div>
-               <div className="w-[90%] m-auto flex justify-center items-center border border-gray-600 px-4 py-1">
-                  {/* <img
+               <div className=" border border-gray-600 rounded-md">
+                  <div className="flex justify-between items-center px-4 py-5 ">
+                     <span>Stake</span>
+                     <span>X</span>
+                  </div>
+                  <div className="w-[90%] m-auto flex justify-center items-center border border-gray-600 px-4 py-1">
+                     {/* <img
                      src={findNetworkByAddress?.logo}
                      alt="image"
                      className="w-5 h-5 rounded-full object-cover"
                   /> */}
-              <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
-                     
-                  <input
-                     className="w-full bg-transparent focus:outline-none p-1"
-                     placeholder="0.0"
-                     value={stakeAmount}
-                     onChange={handleChange}
-                  />
-                  <button
-                     onClick={handleMaxButtonClick}
-                     className="text-sm py-1 px-2 bg-gradient-to-b from-blue-500 hover:bg-blue-900 rounded-md"
-                  >
-                     MAX
-                  </button>
-               </div>
+                     <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
 
-               <div className="flex justify-center items-center px-4 py-2">
+                     <input
+                        className="w-full bg-transparent focus:outline-none p-1"
+                        placeholder="0.0"
+                        value={stakeAmount}
+                        onChange={handleChange}
+                     />
+                     <button
+                        onClick={handleMaxButtonClick}
+                        className="text-sm py-1 px-2 bg-gradient-to-b from-blue-500 hover:bg-blue-900 rounded-md"
+                     >
+                        MAX
+                     </button>
+                  </div>
 
-                  <button
-                     onClick={handleStakeAndUnStakeChange}
-                     className="w-full bg-gradient-to-b from-blue-500 hover:bg-blue-900 p-2 rounded-md"
-                     disabled={stakeLoading || approvedLoading} // Disable button while loading
-                  >
-                     {stakeButtonState === 'Stake' && !isApproved ? (
-                        approvedLoading ? (
+                  <div className="flex justify-center items-center px-4 py-2">
+
+                     <button
+                        onClick={handleStakeAndUnStakeChange}
+                        className="w-full bg-gradient-to-b from-blue-500 hover:bg-blue-900 p-2 rounded-md"
+                        disabled={stakeLoading || approvedLoading} // Disable button while loading
+                     >
+                        {stakeButtonState === 'Stake' && !isApproved ? (
+                           approvedLoading ? (
+                              <Loading />
+                           ) : (
+                              'Approve'
+                           )
+                        ) : stakeButtonState === 'Stake' ? (
+                           stakeLoading ? (
+                              <Loading />
+                           ) : (
+                              'Stake'
+                           )
+                        ) : unStakeLoading ? (
                            <Loading />
                         ) : (
-                           'Approve'
-                        )
-                     ) : stakeButtonState === 'Stake' ? (
-                        stakeLoading ? (
-                           <Loading />
-                        ) : (
-                           'Stake'
-                        )
-                     ) : unStakeLoading ? (
-                        <Loading />
-                     ) : (
-                        stakeButtonState
-                     )}
-                  </button>
-               </div>
+                           stakeButtonState
+                        )}
+                     </button>
+                  </div>
 
-               <div className="flex justify-between items-center py-2 px-4">
-                  <span className="text-sm text-gray-500">
-                     You will Recieve
-                  </span>
-                     <p className="text-sm">{calculateReward} { findNetworkByAddress?.name}</p>
-               </div>
-               <div className="flex justify-between items-center py-2 px-4">
-                  <span className="text-sm text-gray-500">Staking APR</span>
-                  <p className="text-sm">0.5% daily</p>
+                  <div className="flex justify-between items-center py-2 px-4">
+                     <span className="text-sm text-gray-500">
+                        You will Recieve
+                     </span>
+                     <p className="text-sm">{calculateReward} {findNetworkByAddress?.name}</p>
+                  </div>
+                  <div className="flex justify-between items-center py-2 px-4">
+                     <span className="text-sm text-gray-500">Staking APR</span>
+                     <p className="text-sm">0.5% daily</p>
+                  </div>
                </div>
             </div>
-         </div>
          </main>
-         </div>
+      </div>
    );
 };
 export default SingleNetwork;

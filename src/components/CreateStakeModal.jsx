@@ -82,15 +82,8 @@ export function CreateStakeModal() {
    };
    const getButtonText = () => {
       if (!isConnected) return 'Connect Wallet';
-      if (isApproving) return 'Approving...';
       if (isCreating) return 'Creating...';
       return 'Create Stake';
-   };
-
-      const handleApprove = async () => {
-      const { tokenAddress, minimumStake } = stakeParams;
-      const amountInWei = ethers.parseEther(minimumStake.toString());
-      await approveToken(tokenAddress, amountInWei);
    };
 
    console.log({ address });
