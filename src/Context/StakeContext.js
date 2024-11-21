@@ -166,13 +166,11 @@ export const StakingContextProvider = ({ children }) => {
          setIsApproving(true);
          if (!window.ethereum) throw new Error('MetaMask is not detected.');
 
-         const provider = new ethers.BrowserProvider(window.ethereum);
          const signer = await provider.getSigner();
 
          const tokenContract = new ethers.Contract(tokenAddress, approveAbi, signer);
          const approveTx = await tokenContract.approve(shibaseContractAddress, amount);
 
-         console.log("Approval transaction sent:", approveTx.hash);
          await approveTx.wait(); // Wait for the transaction to be mined
          console.log("Approval confirmed");
 
@@ -232,13 +230,6 @@ export const StakingContextProvider = ({ children }) => {
          const aprInWei = ethers.parseUnits(apr.toString(), 18);
          const stakeDuration = ConvertToEpochDuration(duration);
 
-         console.log("Converted Inputs:", {
-            tokenAddress: tokenAddress,
-            minStakeInWei: minStakeInWei.toString(),
-            aprInWei: aprInWei.toString(),
-            stakeDuration: stakeDuration.toString()
-         });
-
          // // Check if protocol fees are enabled and get the fee
          // const protocolFee = await contractInstance.protocolFees();
          // // if (protocolFee > 0) {
@@ -276,7 +267,6 @@ export const StakingContextProvider = ({ children }) => {
             logs: receipt.logs,
             status: receipt.status
          });
-         console.log("Transaction receipt logs:", receipt.logs);
 
          // Decode the logs
          const iface = new ethers.Interface(shibaseAbi);
@@ -305,7 +295,6 @@ export const StakingContextProvider = ({ children }) => {
             }
          }
 
-         console.log("Stake created successfully:", receipt.hash, "Stake Address:", stakeAddress);
 
          toast.success("Stake created successfully!");
 
@@ -322,134 +311,70 @@ export const StakingContextProvider = ({ children }) => {
       }
    };
 
-
-   useEffect(() => {
-      const fetchNetworkDetails = async () => {
-         setIsLoading(true);
-
-         const erc20Tokens = new ethers.Contract("0x7896F3Ab059fa874F6089EE6970bfE3D6D4F9AC2", erc20Abi, provider);
-         const [name, symbol] = await Promise.all([
-            erc20Tokens.name(),
-            erc20Tokens.symbol()
-         ]);
-         console.log({ name, symbol }, "///////////// token details")
-
-         // return {
-         //    // shibAddress: addr,
-         //    // apr: ethers.formatEther(aprInSmallestUnits),
-         //    // totalStake: ethers.formatEther(totalStake),
-         //    // totalStaker: totalStaker.toString(),
-         //    // tokens,
-         //    name,
-         //    symbol
-         // };
-      };
-
-      fetchNetworkDetails
-
-      // setCreatedShibbase(networkDetails);
-   }, []);
-
-
-
-
-   // const fetchPastStakes = async () => {
-   //    try {
-   //       // const provider = new ethers.BrowserProvider(window.ethereum);
-   //       const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
-   //       const erc20Tokens = new ethers.Contract(token, erc20Abi, provider);
-
-   //       const filter = factoryContract.filters.ShibaseStakeCreated();
-   //       const events = await factoryContract.queryFilter(filter, "earliest", "latest");
-   //       console.log(events, "events")
-
-   //       console.log("RPC Request:", {
-   //          address: shibaseContractAddress,
-   //          topics: filter.topics,
-   //          fromBlock: "0x0",
-   //          toBlock: "latest"
-   //       });
-
-
-
-   //       const [name, symbol] = await Promise.all([
-   //          erc20Tokens.name(),
-   //          erc20Tokens.symbol()
-   //       ]);
-
-
-   //       // console.log({ name, symbol }, "token details")
-
-
-   //       if (!events.length) {
-   //          console.warn("No stakes found for the current filter.");
-   //          return [];
-   //       }
-
-   //       return events.map(event => ({
-   //          shibaseStake: event.args.shibaseStake,
-   //          owner: event.args.owner,
-   //          apr: event.args.apr.toString(),
-   //          duration: event.args.duration.toString(),
-   //          min: ethers.formatEther(event.args.min),
-   //          token: event.args.token,
-   //       }));
-   //    } catch (error) {
-   //       console.error("Error fetching past stakes:", error);
-   //       return [];
-   //    }
-   // };
-
-   const fetchPastStakes = async () => {
+   const fetchPastStakesWithDetails = async () => {
       try {
+         // add loading
+
          const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
 
          const filter = factoryContract.filters.ShibaseStakeCreated();
          const events = await factoryContract.queryFilter(filter, "earliest", "latest");
-
-         console.log({ events }, "events");
-
-         console.log("RPC Request:", {
-            address: shibaseContractAddress,
-            topics: filter.topics,
-            fromBlock: "0x0",
-            toBlock: "latest"
-         });
 
          if (events.length === 0) {
             console.warn("No stakes found for the current filter.");
             return [];
          }
 
+         // Use Promise.all to fetch details for all stakes concurrently
+         const stakesWithDetails = await Promise.all(events.map(async (event) => {
+            const shibaseStakeAddress = event.args.shibaseStake;
 
+            // Create a contract instance for the specific ShibaseStake
+            const shibaseStakeContract = new ethers.Contract(
+               shibaseStakeAddress,
+               [
+                  "function vaultInfo() external view returns (tuple(uint256 totalStaked, uint256 totalStaker, uint256 minimumStakeAmount, uint256 ENTRY_RATE, uint256 duration, address TOKEN, address owner, address factory))"
 
+               ],
+               provider
+            );
 
-         // const tokenDetailsPromises = events.map(event => {
-         //    return Promise.all([
-         //       new ethers.Contract(event.args.token, erc20Abi, provider).name(),
-         //       new ethers.Contract(event.args.token, erc20Abi, provider).symbol()
-         //    ]);
-         // });
+            try {
+               // Fetch vault information
+               const vaultInfo = await shibaseStakeContract.vaultInfo();
 
-         // const [tokenNames, tokenSymbols] = await Promise.all(tokenDetailsPromises);
-
-         // console.log({ tokenNames, tokenSymbols }, "token details");
-
-         return events.map((event, index) => ({
-            shibaseStake: event.args.shibaseStake,
-            owner: event.args.owner,
-            apr: event.args.apr.toString(),
-            duration: event.args.duration.toString(),
-            min: ethers.formatEther(event.args.min),
-            // tokenName: tokenNames[index][0],
-            // tokenSymbol: tokenSymbols[index][0],
-            token: event.args.token
+               return {
+                  shibaseStake: shibaseStakeAddress,
+                  name: `Stake ${shibaseStakeAddress.slice(0, 6)}`,
+                  symbol: 'TOKEN',
+                  owner: event.args.owner,
+                  apr: event.args.apr.toString(),
+                  duration: event.args.duration.toString(),
+                  min: ethers.formatEther(event.args.min),
+                  token: event.args.token,
+                  // Additional details from vaultInfo
+                  totalStaked: ethers.formatEther(vaultInfo.totalStaked),
+                  totalStaker: vaultInfo.totalStaker.toString(),
+                  minimumStakeAmount: ethers.formatEther(vaultInfo.minimumStakeAmount),
+                  entryRate: vaultInfo.ENTRY_RATE.toString()
+               };
+            } catch (error) {
+               console.error(`Error fetching details for ${shibaseStakeAddress}:`, error);
+               return null;
+            }
          }));
+
+         // Filter out any null results
+         return stakesWithDetails.filter(stake => stake !== null);
+
       } catch (error) {
          console.error("Error fetching past stakes:", error);
          return [];
       }
    };
+
+
+
 
 
    const listenForNewStakes = () => {
@@ -471,7 +396,6 @@ export const StakingContextProvider = ({ children }) => {
             token,
          };
 
-         console.log("New Stake Created:", newStake);
          // Add this stake to your application's state
       });
 
@@ -487,24 +411,20 @@ export const StakingContextProvider = ({ children }) => {
          provider
       );
       const initialize = async () => {
-         const pastStakes = await fetchPastStakes();
-         console.log(pastStakes, "Fetched past")
-         // pastStakes.forEach(stake => {
-         //    console.log(`Token Name: ${stake.tokenName}, Symbol: ${stake.tokenSymbol}`);
-         //    console.log(`Token Address: ${stake.tokenAddress}`);
-         //    console.log(`Stake Address: ${stake.shibaseStake}`);
-         // });
+         setIsLoading(true);
+
+         const pastStakes = await fetchPastStakesWithDetails();
          setCreatedShibbase(pastStakes);
 
-         const logs = await provider.getLogs({
-            address: '0xaf2e951d9a4BF8d74e594eA8f10D04c58314d520',
+          await provider.getLogs({
+            address: shibaseContractAddress,
             fromBlock: '0x0',
             toBlock: 'latest',
          });
-         console.log("Logs:", logs);
 
 
          listenForNewStakes();
+         setIsLoading(false);
       };
 
       initialize();
@@ -514,6 +434,7 @@ export const StakingContextProvider = ({ children }) => {
          factoryContract.removeAllListeners("ShibaseStakeCreated");
       };
    }, []);
+
 
 
 
@@ -535,7 +456,8 @@ export const StakingContextProvider = ({ children }) => {
             createdShibbase,
             isConnected,
             address,
-            connect
+            connect,
+            provider
          }}
       >
          {children}

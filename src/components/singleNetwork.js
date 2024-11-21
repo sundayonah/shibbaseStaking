@@ -17,7 +17,8 @@ const SingleNetwork = ({ shibAddress, token }) => {
       walletBalance,
       calculateReward,
       ethBalance,
-      createdShibbase
+      createdShibbase,
+      provider
    } = useContext(StakingContext);
 
    const { address } = useAccount();
@@ -34,31 +35,14 @@ const SingleNetwork = ({ shibAddress, token }) => {
    const [claimLoading, setClaimLoading] = useState(false);
 
 
-
-   //    async function getContract() {
-   //    try {
-   //       const provider = new ethers.providers.Web3Provider(window.ethereum);
-   //       const signer = provider.getSigner();
-
-   //       const contractInstance = new ethers.Contract(
-   //          shibAddress,
-   //          stakingAbi2,
-   //          signer
-   //       );
-
-   //       return contractInstance;
-   //    } catch (error) {
-   //       console.error('Error getting approval contract:', error);
-   //       throw error;
-   //    }
-   // }
-
    const getNetworkByAddress = (shibAddress) => {
       return createdShibbase.find(network => network.shibAddress === shibAddress);
    };
 
-   const findNetworkByAddress = getNetworkByAddress(shibAddress)
+   // const findNetworkDetails = getNetworkByAddress(shibAddress)
 
+   // Find the specific network details
+   const findNetworkDetails = createdShibbase.find(network => network.shibaseStake === shibAddress);
 
 
    ///// CLAIM F(x) ///////////
@@ -123,6 +107,8 @@ const SingleNetwork = ({ shibAddress, token }) => {
       setClaimLoading(false);
    };
 
+
+
    const handleMaxButtonClick = async () => {
       try {
          if (address === undefined) {
@@ -138,8 +124,8 @@ const SingleNetwork = ({ shibAddress, token }) => {
             });
             return;
          }
+         console.log("/////////////////")
 
-         const provider = new ethers.BrowserProvider(window.ethereum);
 
          const signer = await provider.getSigner();
 
@@ -148,12 +134,17 @@ const SingleNetwork = ({ shibAddress, token }) => {
             approveAbi,
             signer
          );
+         console.log(contractInstance)
 
          const balance = await contractInstance.balanceOf(address);
+         console.log(balance, "balance")
+
 
          const stringBalance = ethers.formatEther(balance.toString());
+         console.log(stringBalance, "stringBalance")
 
          const formattedBalance = parseFloat(stringBalance).toFixed(3);
+
 
          setMaxBalance(formattedBalance);
          setStakeAmount(formattedBalance);
@@ -172,7 +163,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
       try {
          // const contract = await getContract();
 
-         const provider = new ethers.BrowserProvider(window.ethereum);
          const signer = await provider.getSigner();
          const createdShibbaseInstance = new ethers.Contract(
             shibAddress,
@@ -297,7 +287,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
       }
 
       try {
-         const provider = new ethers.BrowserProvider(window.ethereum);
 
          const signer = await provider.getSigner();
 
@@ -401,25 +390,26 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
 
 
+
    return (
-      <div className='mt-32'>
-         <h1 className='text-center text-5xl'>{findNetworkByAddress?.name}</h1>
-         <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[75%] m-auto my-10">
+      <div className='container mx-auto mt-48'>
+         <h1 className='text-center text-5xl'>{findNetworkDetails?.name}</h1>
+         <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[85%] m-auto my-10">
             <Toaster />
             {/* left side */}
             <div className="w-full md:w-[80%] m-auto">
                <span>Stats</span>
                <div className="p-9 border border-gray-600 rounded-md ">
-                  <h2>${totalAmountStake} {findNetworkByAddress?.symbol}</h2>
-                  <h6 className="text-sm text-gray-500">Total Staked {findNetworkByAddress?.symbol}</h6>
+                  <h2>${findNetworkDetails?.totalStaked} {findNetworkDetails?.symbol}</h2>
+                  <h6 className="text-sm text-gray-500">Total Staked {findNetworkDetails?.symbol}</h6>
                   <div className="flex justify-between items-center pt-5">
                      <span>
-                        <h2>{findNetworkByAddress?.apr} % Daily</h2>
+                        <h2>{findNetworkDetails?.apr} % Daily</h2>
                         <span className="text-sm  text-gray-500">APR</span>
                      </span>
                      <span className="inline-block h-12 border-r border-solid border-gray-600"></span>
                      <span>
-                        <h2>{findNetworkByAddress?.totalStaker}</h2>
+                        <h2>{findNetworkDetails?.totalStaker}</h2>
                         <span className="text-sm  text-gray-500">
                            No. of Stakers
                         </span>
@@ -440,13 +430,13 @@ const SingleNetwork = ({ shibAddress, token }) => {
                         /> */}
                            <img src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" />
 
-                           <span className="pl-1 text-gray-500">{findNetworkByAddress?.symbol}</span>
+                           <span className="pl-1 text-gray-500">{findNetworkDetails?.symbol}</span>
                         </div>
                         <p>{ethBalance}</p>
                      </div>
                      <div className="flex pt-3 justify-between items-center">
                         <div className=" pb-2 ">
-                           <span className="pl-2">{calculateReward} {findNetworkByAddress?.symbol}</span>
+                           <span className="pl-2">{calculateReward} {findNetworkDetails?.symbol}</span>
                            {/* <p>Research</p> */}
                         </div>
                         <button
@@ -539,7 +529,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
                      <span className="text-sm text-gray-500">
                         You will Recieve
                      </span>
-                     <p className="text-sm">{calculateReward} {findNetworkByAddress?.name}</p>
+                     <p className="text-sm">{calculateReward} {findNetworkDetails?.symbol}</p>
                   </div>
                   <div className="flex justify-between items-center py-2 px-4">
                      <span className="text-sm text-gray-500">Staking APR</span>

@@ -15,5 +15,5 @@ export const ConvertToEpochDuration = (days) => {
 
 export const FormatDateTime = (timestamp) => {
     const date = new Date(timestamp * 1000);
-    return `${date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    return `${date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 };

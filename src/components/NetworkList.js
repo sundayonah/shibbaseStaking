@@ -13,7 +13,7 @@ const NetworkCard = ({ network }) => (
     href={`/singleNetwork?shibAddress=${network.shibaseStake}&token=${network.token}`}
     className="block transition-transform hover:scale-105"
   >
-    <Card className="h-full border-blue-950 bg-gradient-to-br from-slate-900 to-slate-800">
+    <Card className="h-full w-full border-blue-950 bg-gradient-to-br from-slate-900 to-slate-800">
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-bold text-white">{network.name}</h3>
@@ -27,12 +27,11 @@ const NetworkCard = ({ network }) => (
           />
         </div>
         <div className="mt-4 space-y-2">
-          <StatsRow label="Total Stake" value={network.totalStake} />
+          <StatsRow label="Total Stake" value={network.totalStaked} />
           <StatsRow label="APR" value={`${network.apr}%`} />
           <StatsRow label="Total Stakers" value={network.totalStaker} />
           <StatsRow label="Minimum Stake" value={network.min} />
           <StatsRow label="Duration (Days)" value={FormatDateTime(network.duration)} />
-
         </div>
       </CardContent>
     </Card>
@@ -41,7 +40,7 @@ const NetworkCard = ({ network }) => (
 
 const StatsRow = ({ label, value }) => (
   <div className="flex justify-between items-center">
-    <span className="text-sm text-gray-400">{label}</span>
+    <span className="text-sm text-gray-400 ">{label}</span>
     <span className="text-sm font-semibold text-white">{value}</span>
   </div>
 );
@@ -69,9 +68,9 @@ const EmptyState = () => (
 const NetworkList = () => {
   const { createdShibbase, isLoading } = useContext(StakingContext);
 
-  // if (isLoading) {
-  //   return <LoadingSpinner />;
-  // }
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 mt-32">

@@ -68,9 +68,6 @@ export function CreateStakeModal() {
       try {
          const result = await CreateStake();
          if (result) {
-            console.log('New Stake Address:', result.stakeAddress);
-            console.log('Transaction Hash:', result.transactionHash);
-
             setIsOpen(false);
          } else {
             toast.error('Failed to create stake.');
@@ -85,8 +82,6 @@ export function CreateStakeModal() {
       if (isCreating) return 'Creating...';
       return 'Create Stake';
    };
-
-   console.log({ address });
 
    return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
