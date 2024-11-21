@@ -220,6 +220,9 @@ export const StakingContextProvider = ({ children }) => {
    const fetchPastStakesWithDetails = async () => {
       try {
          // add loading
+         const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
+
+         const provider = new ethers.getDefaultProvider(alchemyApiKey);
 
          const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
 
@@ -284,7 +287,9 @@ export const StakingContextProvider = ({ children }) => {
 
 
    const listenForNewStakes = () => {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
+      const provider = new ethers.getDefaultProvider(alchemyApiKey);
+
 
 
       const factoryContract = new ethers.Contract(
@@ -310,6 +315,10 @@ export const StakingContextProvider = ({ children }) => {
 
    useEffect(() => {
       // const provider = new ethers.BrowserProvider(window.ethereum);
+      const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
+
+      const provider = new ethers.getDefaultProvider(alchemyApiKey);
+
 
       const factoryContract = new ethers.Contract(
          shibaseContractAddress,
