@@ -403,7 +403,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
    return (
       <>
          <Toaster />
-         <div className='container mx-auto mt-48' data-aos="fade-up"
+         <div className='container mx-auto mt-24' data-aos="fade-up"
          >
 
             <h1 className='text-center text-5xl'>{findNetworkDetails?.name}</h1>

@@ -58,7 +58,7 @@ const NetworkList = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-32">
+    <div className="container mx-auto px-4 py-8 mt-24">
       <Toaster />
       <div className="flex justify-end mb-8">
         <CreateStakeModal />
