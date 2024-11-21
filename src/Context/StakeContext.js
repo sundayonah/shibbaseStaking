@@ -64,98 +64,33 @@ export const StakingContextProvider = ({ children }) => {
 
 
 
-   // useEffect(() => {
-   //    let isMounted = true;
+   useEffect(() => {
 
-   //    const fetchFactory = async () => {
-   //       try {
-   //          setIsLoading(true);
+      const fetchFactory = async () => {
+         try {
 
-   //          // Create provider
-   //          const provider = new ethers.JsonRpcProvider(alchemyApiKey);
+            const contractInstance = new ethers.Contract(
+               "0x652a6F034bA3aEfF9BDCF2Dd1348299a6E39a1dE",
+               approveAbi,
+               provider
+            );
 
-   //          // Create contract instance
-   //          const contractInstance = new ethers.Contract(
-   //             shibaseContractAddress,
-   //             shibaseAbi,
-   //             provider
-   //          );
+            const balance = await contractInstance.balanceOf(address);
+            console.log(balance.toString(), "balance")
 
-   //          // Get all created networks
-   //          const getAllCreatedShibbase = await contractInstance.getAllCreatedShibbase();
 
-   //          if (!isMounted) return;
+         } catch (error) {
+            console.error('Error fetching factory data:', error);
+            toast.error('Failed to fetch networks');
+         } finally {
 
-   //          if (!getAllCreatedShibbase || getAllCreatedShibbase.length === 0) {
-   //             setCreatedShibbase([]);
-   //             setIsLoading(false);
-   //             return;
-   //          }
+         }
+      };
 
-   //          const networkDetails = await Promise.all(
-   //             getAllCreatedShibbase.map(async (addr) => {
-   //                try {
-   //                   const createdShibbase4Address = new ethers.Contract(
-   //                      addr,
-   //                      stakingAbi2,
-   //                      provider
-   //                   );
+      fetchFactory();
 
-   //                   const [
-   //                      aprInSmallestUnits,
-   //                      totalStake,
-   //                      totalStaker,
-   //                      tokens
-   //                   ] = await Promise.all([
-   //                      createdShibbase4Address.RATE(),
-   //                      createdShibbase4Address.totalStaking(),
-   //                      createdShibbase4Address.totalStaker(),
-   //                      createdShibbase4Address.token()
-   //                   ]);
 
-   //                   const erc20Tokens = new ethers.Contract(tokens, erc20Abi, provider);
-   //                   const [name, symbol] = await Promise.all([
-   //                      erc20Tokens.name(),
-   //                      erc20Tokens.symbol()
-   //                   ]);
-
-   //                   return {
-   //                      shibAddress: addr,
-   //                      apr: ethers.formatEther(aprInSmallestUnits),
-   //                      totalStake: ethers.formatEther(totalStake),
-   //                      totalStaker: totalStaker.toString(),
-   //                      tokens,
-   //                      name,
-   //                      symbol
-   //                   };
-   //                } catch (error) {
-   //                   console.error(`Error fetching details for address ${addr}:`, error);
-   //                   return null;
-   //                }
-   //             })
-   //          );
-
-   //          if (!isMounted) return;
-
-   //          // Filter out any null values from failed fetches
-   //          const validNetworks = networkDetails.filter(network => network !== null);
-   //          setCreatedShibbase(validNetworks);
-   //       } catch (error) {
-   //          console.error('Error fetching factory data:', error);
-   //          toast.error('Failed to fetch networks');
-   //       } finally {
-   //          if (isMounted) {
-   //             setIsLoading(false);
-   //          }
-   //       }
-   //    };
-
-   //    fetchFactory();
-
-   //    return () => {
-   //       isMounted = false;
-   //    };
-   // }, []);
+   }, []);
 
 
    // Approve Logic
@@ -315,6 +250,9 @@ export const StakingContextProvider = ({ children }) => {
       try {
          // add loading
 
+         const provider = new ethers.BrowserProvider(window.ethereum);
+
+
          const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
 
          const filter = factoryContract.filters.ShibaseStakeCreated();
@@ -403,7 +341,7 @@ export const StakingContextProvider = ({ children }) => {
    };
 
    useEffect(() => {
-      // const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
 
       const factoryContract = new ethers.Contract(
          shibaseContractAddress,
@@ -416,7 +354,7 @@ export const StakingContextProvider = ({ children }) => {
          const pastStakes = await fetchPastStakesWithDetails();
          setCreatedShibbase(pastStakes);
 
-          await provider.getLogs({
+         await provider.getLogs({
             address: shibaseContractAddress,
             fromBlock: '0x0',
             toBlock: 'latest',

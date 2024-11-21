@@ -91,7 +91,7 @@ export function CreateStakeModal() {
                data-aos="fade-up"
                data-aos-duration="3000"
             >
-               Create Stake
+               {isOpen ? 'Creating Stake...' : 'Create Stake'}
             </Button>
          </DialogTrigger>
          <DialogContent className="bg-gradient-to-br from-slate-900 to-slate-800 border-none shadow-xl">

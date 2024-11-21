@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StakingContext } from '@/Context/StakeContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAccount } from 'wagmi';
@@ -110,7 +110,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
    };
 
 
-
    const handleMaxButtonClick = async () => {
       try {
          if (address === undefined) {
@@ -129,14 +128,15 @@ const SingleNetwork = ({ shibAddress, token }) => {
          console.log("/////////////////")
 
 
-         const signer = await provider.getSigner();
+         // const signer = await provider.getSigner();
+
+         const provider = new ethers.BrowserProvider(window.ethereum);
 
          const contractInstance = new ethers.Contract(
             token,
             approveAbi,
-            signer
+            provider
          );
-         console.log(contractInstance)
 
          const balance = await contractInstance.balanceOf(address);
          console.log(balance, "balance")
@@ -164,6 +164,9 @@ const SingleNetwork = ({ shibAddress, token }) => {
       setStakeLoading(true);
       try {
          // const contract = await getContract();
+
+         const provider = new ethers.BrowserProvider(window.ethereum);
+
 
          const signer = await provider.getSigner();
          const createdShibbaseInstance = new ethers.Contract(
@@ -290,6 +293,9 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
       try {
 
+         const provider = new ethers.BrowserProvider(window.ethereum);
+
+
          const signer = await provider.getSigner();
 
          // const instanceContract = getContract();
@@ -388,160 +394,164 @@ const SingleNetwork = ({ shibAddress, token }) => {
       }
    };
 
-   // useEffect(() => {
-   //    AOS.init({ duration: 800 });
-   // }, []);
+   useEffect(() => {
+      AOS.init({ duration: 3000 });
+   }, []);
+
 
 
    return (
-      <div className='container mx-auto mt-48' data-aos="fade-up"
-         data-aos-duration="3000">
-         <h1 className='text-center text-5xl'>{findNetworkDetails?.name}</h1>
-         <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[85%] m-auto my-10">
-            <Toaster />
-            {/* left side */}
-            <div className="w-full md:w-[80%] m-auto">
-               <span>Stats</span>
-               <div className="p-9 border border-gray-600 rounded-md ">
-                  <h2>${findNetworkDetails?.totalStaked} {findNetworkDetails?.symbol}</h2>
-                  <h6 className="text-sm text-gray-500">Total Staked {findNetworkDetails?.symbol}</h6>
-                  <div className="flex justify-between items-center pt-5">
-                     <span>
-                        <h2>{findNetworkDetails?.apr} % Daily</h2>
-                        <span className="text-sm  text-gray-500">APR</span>
-                     </span>
-                     <span className="inline-block h-12 border-r border-solid border-gray-600"></span>
-                     <span>
-                        <h2>{findNetworkDetails?.totalStaker}</h2>
-                        <span className="text-sm  text-gray-500">
-                           No. of Stakers
+      <>
+         <Toaster />
+         <div className='container mx-auto mt-48' data-aos="fade-up"
+         >
+
+            <h1 className='text-center text-5xl'>{findNetworkDetails?.name}</h1>
+            <main className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-[80%] md:w-[75%] lg:w-[85%] m-auto my-10">
+               {/* left side */}
+               <div className="w-full md:w-[80%] m-auto">
+                  <span>Stats</span>
+                  <div className="p-9 border border-gray-600 rounded-md ">
+                     <h2>${findNetworkDetails?.totalStaked} {findNetworkDetails?.symbol}</h2>
+                     <h6 className="text-sm text-gray-500">Total Staked {findNetworkDetails?.symbol}</h6>
+                     <div className="flex justify-between items-center pt-5">
+                        <span>
+                           <h2>{findNetworkDetails?.apr} % Daily</h2>
+                           <span className="text-sm  text-gray-500">APR</span>
                         </span>
-                     </span>
+                        <span className="inline-block h-12 border-r border-solid border-gray-600"></span>
+                        <span>
+                           <h2>{findNetworkDetails?.totalStaker}</h2>
+                           <span className="text-sm  text-gray-500">
+                              No. of Stakers
+                           </span>
+                        </span>
+                     </div>
                   </div>
-               </div>
-               <div className="mt-10">
-                  <span className="">Balances</span>
-                  <div className="p-6  border border-gray-600 rounded-md ">
-                     <div className="flex pb-3 justify-between border-b border-gray-600">
-                        <div className="flex justify-center items-center">
-                           {/* <img
+                  <div className="mt-10">
+                     <span className="">Balances</span>
+                     <div className="p-6  border border-gray-600 rounded-md ">
+                        <div className="flex pb-3 justify-between border-b border-gray-600">
+                           <div className="flex justify-center items-center">
+                              {/* <img
                            src={findNetworkByAddress?.logo}
                            // width={30}
                            // height={20}
                            alt="image"
                            className="w-5 h-5 rounded-full object-cover"
                         /> */}
-                           <Image src="/shibase.png" className="w-4 h-4 rounded-full" width={100} height={100} alt="image name" />
+                              <Image src="/shibase.png" className="w-4 h-4 rounded-full" width={100} height={100} alt="image name" />
 
-                           <span className="pl-1 text-gray-500">{findNetworkDetails?.symbol}</span>
+                              <span className="pl-1 text-gray-500">{findNetworkDetails?.symbol}</span>
+                           </div>
+                           <p>{ethBalance}</p>
                         </div>
-                        <p>{ethBalance}</p>
-                     </div>
-                     <div className="flex pt-3 justify-between items-center">
-                        <div className=" pb-2 ">
-                           <span className="pl-2">{calculateReward} {findNetworkDetails?.symbol}</span>
-                           {/* <p>Research</p> */}
+                        <div className="flex pt-3 justify-between items-center">
+                           <div className=" pb-2 ">
+                              <span className="pl-2">{calculateReward} {findNetworkDetails?.symbol}</span>
+                              {/* <p>Research</p> */}
+                           </div>
+                           <button
+                              onClick={() => Claim()}
+                              className="bg-gradient-to-b from-blue-500 hover:bg-blue-900 py-1 px-2 rounded-md"
+                           >
+                              {claimLoading ? <Loading /> : 'Claim Now'}
+                           </button>
                         </div>
-                        <button
-                           onClick={() => Claim()}
-                           className="bg-gradient-to-b from-blue-500 hover:bg-blue-900 py-1 px-2 rounded-md"
-                        >
-                           {claimLoading ? <Loading /> : 'Claim Now'}
-                        </button>
                      </div>
                   </div>
                </div>
-            </div>
-            {/* right side */}
-            <div className="w-full md:w-[80%] m-auto ">
-               <div className="flex justify-center items-center py-7">
-                  <button
-                     onClick={() => handleButtonAboveClick('Stake')}
-                     className={` border border-gray-600 px-8 md:px-12 p-2 ${stakeButtonState === 'Stake'
-                        ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                        : ''
-                        }`}
-                  >
-                     Stake
-                  </button>
-                  <button
-                     onClick={() => handleButtonAboveClick('Unstake')}
-                     className={` border border-gray-600 px-8 md:px-12 p-2 ${stakeButtonState === 'Unstake'
-                        ? 'bg-blue-700 hover:bg-blue-600 text-white'
-                        : ''
-                        }`}
-                  >
-                     Unstake
-                  </button>
-               </div>
-               <div className=" border border-gray-600 rounded-md">
-                  <div className="flex justify-between items-center px-4 py-5 ">
-                     <span>Stake</span>
-                     <span>X</span>
+               {/* right side */}
+               <div className="w-full md:w-[80%] m-auto ">
+                  <div className="flex justify-center items-center py-7">
+                     <button
+                        onClick={() => handleButtonAboveClick('Stake')}
+                        className={` border border-gray-600 px-8 md:px-12 p-2 ${stakeButtonState === 'Stake'
+                           ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                           : ''
+                           }`}
+                     >
+                        Stake
+                     </button>
+                     <button
+                        onClick={() => handleButtonAboveClick('Unstake')}
+                        className={` border border-gray-600 px-8 md:px-12 p-2 ${stakeButtonState === 'Unstake'
+                           ? 'bg-blue-700 hover:bg-blue-600 text-white'
+                           : ''
+                           }`}
+                     >
+                        Unstake
+                     </button>
                   </div>
-                  <div className="w-[90%] m-auto flex justify-center items-center border border-gray-600 px-4 py-1">
-                     {/* <img
+                  <div className=" border border-gray-600 rounded-md">
+                     <div className="flex justify-between items-center px-4 py-5 ">
+                        <span>Stake</span>
+                        <span>X</span>
+                     </div>
+                     <div className="w-[90%] m-auto flex justify-center items-center border border-gray-600 px-4 py-1">
+                        {/* <img
                      src={findNetworkByAddress?.logo}
                      alt="image"
                      className="w-5 h-5 rounded-full object-cover"
                   /> */}
-                     <Image src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" width={100} height={100} />
+                        <Image src="/shibase.png" className="w-4 h-4 rounded-full" alt="image name" width={100} height={100} />
 
-                     <input
-                        className="w-full bg-transparent focus:outline-none p-1"
-                        placeholder="0.0"
-                        value={stakeAmount}
-                        onChange={handleChange}
-                     />
-                     <button
-                        onClick={handleMaxButtonClick}
-                        className="text-sm py-1 px-2 bg-gradient-to-b from-blue-500 hover:bg-blue-900 rounded-md"
-                     >
-                        MAX
-                     </button>
-                  </div>
+                        <input
+                           className="w-full bg-transparent focus:outline-none p-1"
+                           placeholder="0.0"
+                           value={stakeAmount}
+                           onChange={handleChange}
+                        />
+                        <button
+                           onClick={handleMaxButtonClick}
+                           className="text-sm py-1 px-2 bg-gradient-to-b from-blue-500 hover:bg-blue-900 rounded-md"
+                        >
+                           MAX
+                        </button>
+                     </div>
 
-                  <div className="flex justify-center items-center px-4 py-2">
+                     <div className="flex justify-center items-center px-4 py-2">
 
-                     <button
-                        onClick={handleStakeAndUnStakeChange}
-                        className="w-full bg-gradient-to-b from-blue-500 hover:bg-blue-900 p-2 rounded-md"
-                        disabled={stakeLoading || approvedLoading} // Disable button while loading
-                     >
-                        {stakeButtonState === 'Stake' && !isApproved ? (
-                           approvedLoading ? (
+                        <button
+                           onClick={handleStakeAndUnStakeChange}
+                           className="w-full bg-gradient-to-b from-blue-500 hover:bg-blue-900 p-2 rounded-md"
+                           disabled={stakeLoading || approvedLoading} // Disable button while loading
+                        >
+                           {stakeButtonState === 'Stake' && !isApproved ? (
+                              approvedLoading ? (
+                                 <Loading />
+                              ) : (
+                                 'Approve'
+                              )
+                           ) : stakeButtonState === 'Stake' ? (
+                              stakeLoading ? (
+                                 <Loading />
+                              ) : (
+                                 'Stake'
+                              )
+                           ) : unStakeLoading ? (
                               <Loading />
                            ) : (
-                              'Approve'
-                           )
-                        ) : stakeButtonState === 'Stake' ? (
-                           stakeLoading ? (
-                              <Loading />
-                           ) : (
-                              'Stake'
-                           )
-                        ) : unStakeLoading ? (
-                           <Loading />
-                        ) : (
-                           stakeButtonState
-                        )}
-                     </button>
-                  </div>
+                              stakeButtonState
+                           )}
+                        </button>
+                     </div>
 
-                  <div className="flex justify-between items-center py-2 px-4">
-                     <span className="text-sm text-gray-500">
-                        You will Recieve
-                     </span>
-                     <p className="text-sm">{calculateReward} {findNetworkDetails?.symbol}</p>
-                  </div>
-                  <div className="flex justify-between items-center py-2 px-4">
-                     <span className="text-sm text-gray-500">Staking APR</span>
-                     <p className="text-sm">0.5% daily</p>
+                     <div className="flex justify-between items-center py-2 px-4">
+                        <span className="text-sm text-gray-500">
+                           You will Recieve
+                        </span>
+                        <p className="text-sm">{calculateReward} {findNetworkDetails?.symbol}</p>
+                     </div>
+                     <div className="flex justify-between items-center py-2 px-4">
+                        <span className="text-sm text-gray-500">Staking APR</span>
+                        <p className="text-sm">0.5% daily</p>
+                     </div>
                   </div>
                </div>
-            </div>
-         </main>
-      </div>
+            </main>
+         </div>
+      </>
    );
 };
 export default SingleNetwork;

@@ -16,7 +16,7 @@ const NetworkCard = ({ network }) => (
     href={`/singleNetwork?shibAddress=${network.shibaseStake}&token=${network.token}`}
     className="block  hover:shadow-2xl"
   >
-    <Card className="h-full w-full border-blue-950 bg-gradient-to-br from-slate-900 to-slate-800 " data-aos="fade-up"
+    <Card className="h-full w-full border-none bg-gradient-to-br from-slate-900 to-slate-800 " data-aos="fade-up"
       data-aos-duration="3000">
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
