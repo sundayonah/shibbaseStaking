@@ -250,9 +250,6 @@ export const StakingContextProvider = ({ children }) => {
       try {
          // add loading
 
-         const provider = new ethers.BrowserProvider(window.ethereum);
-
-
          const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
 
          const filter = factoryContract.filters.ShibaseStakeCreated();
@@ -316,7 +313,7 @@ export const StakingContextProvider = ({ children }) => {
 
 
    const listenForNewStakes = () => {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      // const provider = new ethers.BrowserProvider(window.ethereum);
 
 
       const factoryContract = new ethers.Contract(
@@ -341,7 +338,7 @@ export const StakingContextProvider = ({ children }) => {
    };
 
    useEffect(() => {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      // const provider = new ethers.BrowserProvider(window.ethereum);
 
       const factoryContract = new ethers.Contract(
          shibaseContractAddress,
