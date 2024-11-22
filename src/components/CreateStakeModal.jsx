@@ -28,18 +28,25 @@ export function CreateStakeModal() {
    } = useContext(StakingContext);
 
    const [isOpen, setIsOpen] = useState(false);
+   const [customApr, setCustomApr] = useState('');
+   const [selectedApr, setSelectedApr] = useState('');
 
-   // Clear stakeParams and close modal when dialog is closed
-   useEffect(() => {
-      if (!isOpen) {
-         setStakeParams({
-            tokenAddress: '',
-            minimumStake: '',
-            apr: '',
-            duration: '',
-         });
-      }
-   }, [isOpen, setStakeParams]);
+   const durationOptions = [
+      // { label: 'Flexible', value: 'flexible' },
+      { label: '1 Week', value: '7' },
+      { label: '2 Weeks', value: '14' },
+      { label: '1 Month', value: '30' },
+      { label: '3 Months', value: '90' },
+      { label: '6 Months', value: '180' },
+      { label: '1 Year', value: '365' },
+   ];
+
+   const aprOptions = [
+      { label: '5%', value: '5' },
+      { label: '10%', value: '10' },
+      { label: '15%', value: '15' },
+      { label: '20%', value: '20' },
+   ];
 
    const handleSubmit = async (e) => {
       e.preventDefault();
@@ -82,6 +89,33 @@ export function CreateStakeModal() {
       if (isCreating) return 'Creating...';
       return 'Create Stake';
    };
+
+   const handleAprChange = (value) => {
+      if (value === 'custom') {
+         setSelectedApr('');
+         setCustomApr('');
+      } else {
+         setSelectedApr(value);
+         setStakeParams({ ...stakeParams, apr: value });
+      }
+   };
+
+   const handleCustomAprChange = (value) => {
+      setCustomApr(value);
+      setStakeParams({ ...stakeParams, apr: value });
+   };
+
+   // Clear stakeParams and close modal when dialog is closed
+   useEffect(() => {
+      if (!isOpen) {
+         setStakeParams({
+            tokenAddress: '',
+            minimumStake: '',
+            apr: '',
+            duration: '',
+         });
+      }
+   }, [isOpen, setStakeParams]);
 
    return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -158,7 +192,7 @@ export function CreateStakeModal() {
                   />
                </div>
 
-               <div className="grid grid-cols-4 items-center gap-4">
+               {/* <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="apr" className="text-right text-gray-300">
                      APR (%)
                   </Label>
@@ -178,9 +212,45 @@ export function CreateStakeModal() {
                      step="0.1"
                      min="0"
                   />
+               </div> */}
+               <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="apr" className="text-right text-gray-300">
+                     APR (%)
+                  </Label>
+                  <div className="col-span-3 relative">
+                     <select
+                        id="apr"
+                        name="apr"
+                        className="w-full bg-slate-800 py-2 px-2 border-slate-700 text-white placeholder:text-gray-500 rounded-md"
+                        value={selectedApr || stakeParams.apr}
+                        onChange={(e) => handleAprChange(e.target.value)}
+                        required
+                     >
+                        <option value="">Select APR</option>
+                        {aprOptions.map((option) => (
+                           <option key={option.value} value={option.value}>
+                              {option.label}
+                           </option>
+                        ))}
+                        <option value="custom">Other</option>
+                     </select>
+                     {selectedApr === 'custom' && (
+                        <Input
+                           id="customApr"
+                           type="number"
+                           placeholder="Enter custom APR"
+                           className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                           value={customApr}
+                           onChange={handleCustomAprChange}
+                           step="0.1"
+                           min="0"
+                           required
+                        />
+                     )}
+                  </div>
                </div>
 
-               <div className="grid grid-cols-4 items-center gap-4">
+               {/* <div className="grid grid-cols-4 items-center gap-4">
                   <Label
                      htmlFor="duration"
                      className="text-right text-gray-300"
@@ -202,8 +272,37 @@ export function CreateStakeModal() {
                      required
                      min="1"
                   />
+               </div> */}
+               <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                     htmlFor="duration"
+                     className="text-right text-gray-300"
+                  >
+                     Duration
+                  </Label>
+                  <div className="col-span-3 relative">
+                     <select
+                        id="duration"
+                        name="duration"
+                        className="w-full bg-slate-800 py-2 px-2 border-slate-700 text-white placeholder:text-gray-500 rounded-md"
+                        value={stakeParams.duration}
+                        onChange={(e) =>
+                           setStakeParams({
+                              ...stakeParams,
+                              duration: e.target.value,
+                           })
+                        }
+                        required
+                     >
+                        <option value="">Select Duration</option>
+                        {durationOptions.map((option) => (
+                           <option key={option.value} value={option.value}>
+                              {option.label}
+                           </option>
+                        ))}
+                     </select>
+                  </div>
                </div>
-
                <div className="flex justify-center space-x-2 mt-4">
                   <Button
                      type="submit"

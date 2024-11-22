@@ -109,7 +109,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
       setClaimLoading(false);
    };
 
-
    const handleMaxButtonClick = async () => {
       try {
          if (address === undefined) {
@@ -166,7 +165,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
          // const contract = await getContract();
 
          const provider = new ethers.BrowserProvider(window.ethereum);
-
 
          const signer = await provider.getSigner();
          const createdShibbaseInstance = new ethers.Contract(

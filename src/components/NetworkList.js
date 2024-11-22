@@ -6,7 +6,7 @@ import CreateStakeModal from "./CreateStakeModal";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Toaster } from "react-hot-toast";
-import { EmptyState, FormatDateTime, LoadingSpinner, StatsRow } from "@/lib/helper";
+import { EmptyState, FormatDateTime, LoadingSpinner } from "@/lib/helper";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -41,6 +41,14 @@ const NetworkCard = ({ network }) => (
     </Card>
   </Link>
 );
+
+const StatsRow = ({ label, value }) => (
+  <div className="flex justify-between items-center">
+    <span className="text-sm text-gray-400 ">{label}</span>
+    <span className="text-sm font-semibold text-white">{value}</span>
+  </div>
+);
+
 
 
 
