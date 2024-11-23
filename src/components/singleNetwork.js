@@ -458,7 +458,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
                         </div>
                         <div className="flex pt-3 justify-between items-center">
                            <div className=" pb-2 ">
-                              <span className="pl-2">{parseFloat(findNetworkDetails?.userInfo.reward).toFixed(2)} {findNetworkDetails?.symbol}</span>
+                              <span className="pl-2">{parseFloat(findNetworkDetails?.userInfo?.reward).toFixed(2)} {findNetworkDetails?.symbol}</span>
                               {/* <p>Research</p> */}
                            </div>
                            <button
