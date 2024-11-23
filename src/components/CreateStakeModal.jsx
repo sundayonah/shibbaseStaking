@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { StakingContext } from '@/Context/StakeContext';
 import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
+import { aprOptions, durationOptions } from '@/lib/helper';
 
 export function CreateStakeModal() {
    const {
@@ -30,23 +31,6 @@ export function CreateStakeModal() {
    const [isOpen, setIsOpen] = useState(false);
    const [customApr, setCustomApr] = useState('');
    const [selectedApr, setSelectedApr] = useState('');
-
-   const durationOptions = [
-      // { label: 'Flexible', value: 'flexible' },
-      { label: '1 Week', value: '7' },
-      { label: '2 Weeks', value: '14' },
-      { label: '1 Month', value: '30' },
-      { label: '3 Months', value: '90' },
-      { label: '6 Months', value: '180' },
-      { label: '1 Year', value: '365' },
-   ];
-
-   const aprOptions = [
-      { label: '5%', value: '5' },
-      { label: '10%', value: '10' },
-      { label: '15%', value: '15' },
-      { label: '20%', value: '20' },
-   ];
 
    const handleSubmit = async (e) => {
       e.preventDefault();
@@ -70,7 +54,6 @@ export function CreateStakeModal() {
          toast.error('Please fill all the fields.');
          return;
       }
-      // console the input paramaters
 
       try {
          const result = await CreateStake();
@@ -249,30 +232,6 @@ export function CreateStakeModal() {
                      )}
                   </div>
                </div>
-
-               {/* <div className="grid grid-cols-4 items-center gap-4">
-                  <Label
-                     htmlFor="duration"
-                     className="text-right text-gray-300"
-                  >
-                     Duration (Days)
-                  </Label>
-                  <Input
-                     id="duration"
-                     type="number"
-                     placeholder="30"
-                     className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
-                     value={stakeParams.duration}
-                     onChange={(e) =>
-                        setStakeParams({
-                           ...stakeParams,
-                           duration: e.target.value,
-                        })
-                     }
-                     required
-                     min="1"
-                  />
-               </div> */}
                <div className="grid grid-cols-4 items-center gap-4">
                   <Label
                      htmlFor="duration"

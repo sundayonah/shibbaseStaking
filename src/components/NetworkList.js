@@ -11,6 +11,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 
+
 const NetworkCard = ({ network }) => (
   <Link
     href={`/singleNetwork?shibAddress=${network.shibaseStake}&token=${network.token}`}
@@ -21,14 +22,9 @@ const NetworkCard = ({ network }) => (
       <CardContent className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-bold text-white">{network.name}</h3>
-          <Image
-            src="/shibase.png"
-            className="w-8 h-8 rounded-full"
-            width={100}
-            height={100}
-            alt={`${network.name} logo`}
-            priority
-          />
+          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-slate-600 to-slate-500 text-white text-sm font-bold rounded-full shadow-md">
+            {network.symbol}
+          </div>
         </div>
         <div className="mt-4 space-y-2">
           <StatsRow label="Total Stake" value={network.totalStaked} />
@@ -40,6 +36,7 @@ const NetworkCard = ({ network }) => (
       </CardContent>
     </Card>
   </Link>
+  // 20139
 );
 
 const StatsRow = ({ label, value }) => (

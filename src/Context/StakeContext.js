@@ -4,6 +4,7 @@ import { InjectedConnector } from 'wagmi/connectors/injected';
 import { ethers } from 'ethers';
 
 import shibaseAbi from '@/Contract/shibaseAbi.json';
+import stakingAbi from '@/Contract/stakingAbi2.json';
 import erc20Abi from '@/Contract/erc20Abi.json';
 import approveAbi from '@/Contract/approve.json';
 import toast from 'react-hot-toast';
@@ -31,8 +32,8 @@ export const StakingContextProvider = ({ children }) => {
 
 
    // testnet
-   // const shibaseContractAddress = "0x0B440864fe9f47da44E45A193012a60dD73d8062"
-   const shibaseContractAddress = "0xaf2e951d9a4BF8d74e594eA8f10D04c58314d520"
+   const shibaseContractAddress = "0x34BA159A08773127b3522b7819c6A7Cab9CDf8f6"
+   // const shibaseContractAddress = "0xaf2e951d9a4BF8d74e594eA8f10D04c58314d520"
 
    const subscriptionRef = useRef();
 
@@ -42,10 +43,6 @@ export const StakingContextProvider = ({ children }) => {
    const [isLoading, setIsLoading] = useState(true);
    const [isCreating, setIsCreating] = useState(false);
    const [isApproving, setIsApproving] = useState(false);
-
-
-
-
 
    const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
 
@@ -67,29 +64,29 @@ export const StakingContextProvider = ({ children }) => {
    // Approve Logic
 
 
-   const approveToken = async (tokenAddress, amount) => {
-      try {
-         setIsApproving(true);
-         if (!window.ethereum) throw new Error('MetaMask is not detected.');
+   // const approveToken = async (tokenAddress, amount) => {
+   //    try {
+   //       setIsApproving(true);
+   //       if (!window.ethereum) throw new Error('MetaMask is not detected.');
 
-         const signer = await provider.getSigner();
+   //       const signer = await provider.getSigner();
 
-         const tokenContract = new ethers.Contract(tokenAddress, approveAbi, signer);
-         const approveTx = await tokenContract.approve(shibaseContractAddress, amount);
+   //       const tokenContract = new ethers.Contract(tokenAddress, approveAbi, signer);
+   //       const approveTx = await tokenContract.approve(shibaseContractAddress, amount);
 
-         await approveTx.wait(); // Wait for the transaction to be mined
-         console.log("Approval confirmed");
+   //       await approveTx.wait(); // Wait for the transaction to be mined
+   //       console.log("Approval confirmed");
 
-         toast.success("Token is approved for staking!");
-         return true;
-      } catch (error) {
-         console.error('Approval Error:', error);
-         toast.error("Token approval failed. Please try again.");
-         return false;
-      } finally {
-         setIsApproving(false);
-      }
-   };
+   //       toast.success("Token is approved for staking!");
+   //       return true;
+   //    } catch (error) {
+   //       console.error('Approval Error:', error);
+   //       toast.error("Token approval failed. Please try again.");
+   //       return false;
+   //    } finally {
+   //       setIsApproving(false);
+   //    }
+   // };
 
    const CreateStake = async () => {
       const { tokenAddress, minimumStake, apr, duration } = stakeParams;
@@ -148,7 +145,7 @@ export const StakingContextProvider = ({ children }) => {
             minStakeInWei,
             apr,
             stakeDuration,
-            // { value: protocolFee } // Send protocol fee along with the transaction
+            // { value: protocolFee }
          );
 
          // Add 20% buffer to gas estimate
@@ -219,11 +216,7 @@ export const StakingContextProvider = ({ children }) => {
 
    const fetchPastStakesWithDetails = async () => {
       try {
-         // add loading
-         const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
-
          const provider = new ethers.getDefaultProvider(alchemyApiKey);
-
          const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
 
          const filter = factoryContract.filters.ShibaseStakeCreated();
@@ -243,29 +236,44 @@ export const StakingContextProvider = ({ children }) => {
                shibaseStakeAddress,
                [
                   "function vaultInfo() external view returns (tuple(uint256 totalStaked, uint256 totalStaker, uint256 minimumStakeAmount, uint256 ENTRY_RATE, uint256 duration, address TOKEN, address owner, address factory))"
-
                ],
                provider
             );
 
+            // bal of claim isinside calculateReward or userInfo, userData give amoint users has stake, 
             try {
                // Fetch vault information
                const vaultInfo = await shibaseStakeContract.vaultInfo();
 
+               // Create ERC20 contract instance for the token
+               const tokenContract = new ethers.Contract(
+                  vaultInfo.TOKEN,
+                  erc20Abi,
+                  provider
+               );
+
+               // Fetch token name and symbol
+               const [tokenName, tokenSymbol] = await Promise.all([
+                  tokenContract.name(),
+                  tokenContract.symbol()
+               ]);
+
                return {
                   shibaseStake: shibaseStakeAddress,
-                  name: `Stake ${shibaseStakeAddress.slice(0, 6)}`,
-                  symbol: 'TOKEN',
+                  name: tokenName,
+                  symbol: tokenSymbol,
                   owner: event.args.owner,
                   apr: event.args.apr.toString(),
                   duration: event.args.duration.toString(),
                   min: ethers.formatEther(event.args.min),
-                  token: event.args.token,
-                  // Additional details from vaultInfo
+                  token: vaultInfo.TOKEN,
                   totalStaked: ethers.formatEther(vaultInfo.totalStaked),
                   totalStaker: vaultInfo.totalStaker.toString(),
                   minimumStakeAmount: ethers.formatEther(vaultInfo.minimumStakeAmount),
-                  entryRate: vaultInfo.ENTRY_RATE.toString()
+                  entryRate: vaultInfo.ENTRY_RATE.toString(),
+                  durationInDays: Number(event.args.duration) / (24 * 60 * 60),
+                  timeLeft: Math.max(0, Number(event.args.duration) - (Date.now() / 1000)),
+                  active: Number(event.args.duration) > (Date.now() / 1000)
                };
             } catch (error) {
                console.error(`Error fetching details for ${shibaseStakeAddress}:`, error);
@@ -282,9 +290,106 @@ export const StakingContextProvider = ({ children }) => {
       }
    };
 
+   // Function to fetch user info for a specific stake
+   const fetchUserStakeInfo = async (stakeAddress, userAddress, provider) => {
+      try {
+         // Create stake contract instance
+         const stakeContract = new ethers.Contract(
+            stakeAddress,
+            stakingAbi,
+            provider
+         );
+
+         // Fetch vault info and user info concurrently
+         const [vaultInfo, userInfo] = await Promise.all([
+            stakeContract.vaultInfo(),
+            stakeContract.userInfo(userAddress)
+         ]);
+
+         // Get token decimals
+         const tokenContract = new ethers.Contract(
+            vaultInfo.TOKEN,
+            erc20Abi,
+            provider
+         );
+         const decimals = await tokenContract.decimals().catch(() => 18);
+
+         // Format user info with additional derived data
+         return {
+            stakeAddress,
+            userAddress,
+            staker: userInfo._staker,
+            amountStaked: ethers.formatUnits(userInfo._amountStaked, decimals),
+            reward: ethers.formatUnits(userInfo._userReward, decimals),
+            timeStaked: {
+               timestamp: Number(userInfo._timeStaked),
+               date: new Date(Number(userInfo._timeStaked) * 1000).toLocaleString()
+            },
+            hasActiveStake: userInfo._amountStaked > 0,
+            tokenAddress: vaultInfo.TOKEN,
+            decimals
+         };
+      } catch (error) {
+         console.error(`Error fetching user info for stake ${stakeAddress}:`, error);
+         return null;
+      }
+   };
 
 
+   // Function to fetch user info for multiple stakes
+   const fetchAllUserStakeInfo = async (stakeAddresses, userAddress) => {
+      try {
+         const provider = new ethers.getDefaultProvider(alchemyApiKey);
 
+         // Process stakes in batches to avoid rate limiting
+         const batchSize = 5;
+         const userStakeInfo = [];
+
+         for (let i = 0; i < stakeAddresses.length; i += batchSize) {
+            const batch = stakeAddresses.slice(i, i + batchSize);
+
+            const batchResults = await Promise.all(
+               batch.map(address => fetchUserStakeInfo(address, userAddress, provider))
+            );
+
+            userStakeInfo.push(...batchResults.filter(Boolean));
+
+            // Add slight delay between batches
+            if (i + batchSize < stakeAddresses.length) {
+               await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+         }
+
+         return userStakeInfo;
+      } catch (error) {
+         console.error("Error fetching user stake info:", error);
+         throw error;
+      }
+   };
+
+   const fetchStakesWithUserInfo = async () => {
+      try {
+         // First get all stakes
+         const stakes = await fetchPastStakesWithDetails();
+         console.log(stakes, "stakes stakes")
+
+         // Then fetch user info for all stakes
+         const userInfo = await fetchAllUserStakeInfo(
+            stakes.map(stake => stake.shibaseStake),
+            address
+         );
+         console.log(userInfo, "user info with past stakes")
+
+         // Combine the data
+         return stakes.map(stake => ({
+            ...stake,
+            userInfo: userInfo.find(info => info?.stakeAddress === stake.shibaseStake) || null
+         }));
+      } catch (error) {
+         console.error("Error fetching stakes with user info:", error);
+         throw error;
+      }
+   };
 
    const listenForNewStakes = () => {
       const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
@@ -309,9 +414,8 @@ export const StakingContextProvider = ({ children }) => {
 
          // Add this stake to your application's state
       });
-
-
    };
+
 
    useEffect(() => {
       // const provider = new ethers.BrowserProvider(window.ethereum);
@@ -328,8 +432,10 @@ export const StakingContextProvider = ({ children }) => {
       const initialize = async () => {
          setIsLoading(true);
 
-         const pastStakes = await fetchPastStakesWithDetails();
-         setCreatedShibbase(pastStakes);
+         const userInfoWithPastEvents = await fetchStakesWithUserInfo()
+         console.log(userInfoWithPastEvents, "user Info With Past Events ✔️")
+
+         setCreatedShibbase(userInfoWithPastEvents);
 
          await provider.getLogs({
             address: shibaseContractAddress,
@@ -362,7 +468,7 @@ export const StakingContextProvider = ({ children }) => {
             shibaseContractAddress,
             shibaseAbi,
             isApproving,
-            approveToken,
+            // approveToken,
             stakeParams,
             setStakeParams,
             CreateStake,

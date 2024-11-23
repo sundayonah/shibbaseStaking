@@ -37,12 +37,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
    const [claimLoading, setClaimLoading] = useState(false);
 
 
-   const getNetworkByAddress = (shibAddress) => {
-      return createdShibbase.find(network => network.shibAddress === shibAddress);
-   };
-
-   // const findNetworkDetails = getNetworkByAddress(shibAddress)
-
    // Find the specific network details
    const findNetworkDetails = createdShibbase.find(network => network.shibaseStake === shibAddress);
 
@@ -189,9 +183,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
          const stringAmount = _amount.toString();
 
+         console.log(stringAmount)
 
          const tx = await createdShibbaseInstance.stake(stringAmount, {
-            gasLimit: 7000000,
+            gasLimit: 700000,
             gasPrice: ethers.parseUnits('15.0', 'gwei'),
 
          });
@@ -227,6 +222,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
             stakingAbi2,
             signer
          );
+         // get userInfo 
+         const getUserInfo = await contract.userInfo(address)
+         console.log(getUserInfo)
+
 
          // const contract = await getContract();
 
@@ -351,6 +350,15 @@ const SingleNetwork = ({ shibAddress, token }) => {
          const receipt = await tx.wait();
          //   check if the transaction was successful
          if (receipt.status === 1) {
+            toast.success(`Token Approved.`, {
+               duration: 4000,
+               position: 'top-right',
+               icon: '✅',
+               style: {
+                  color: '#fff',
+                  background: `linear-gradient(to right, #000f58, #000624)`,
+               },
+            });
             setIsApproved(true);
             setApprovedLoading(false);
          } else {
@@ -438,15 +446,15 @@ const SingleNetwork = ({ shibAddress, token }) => {
                            alt="image"
                            className="w-5 h-5 rounded-full object-cover"
                         /> */}
-                              <Image src="/shibase.png" className="w-4 h-4 rounded-full" width={100} height={100} alt="image name" />
+                              {/* <Image src="/shibase.png" className="w-4 h-4 rounded-full" width={100} height={100} alt="image name" /> */}
 
-                              <span className="pl-1 text-gray-500">{findNetworkDetails?.symbol}</span>
+                              <span className="flex items-center justify-center w-7 h-7 bg-gradient-to-r from-slate-600 to-slate-500 text-white text-xs font-bold rounded-full shadow-md">{findNetworkDetails?.symbol}</span>
                            </div>
                            <p>{ethBalance}</p>
                         </div>
                         <div className="flex pt-3 justify-between items-center">
                            <div className=" pb-2 ">
-                              <span className="pl-2">{calculateReward} {findNetworkDetails?.symbol}</span>
+                              <span className="pl-2">{parseFloat(findNetworkDetails?.userInfo.reward).toFixed(2)} {findNetworkDetails?.symbol}</span>
                               {/* <p>Research</p> */}
                            </div>
                            <button

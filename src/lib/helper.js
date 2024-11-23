@@ -20,6 +20,13 @@ export const FormatDateTime = (timestamp) => {
     return `${date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 };
 
+// export const FormatDurationInDays = (durationInSeconds) => {
+//     const secondsInADay = 86400; // Number of seconds in a day
+//     const durationInDays = durationInSeconds / secondsInADay;
+//     return durationInDays.toFixed(2); // Limit to 2 decimal places
+// };
+
+
 export const LoadingSpinner = () => (
     <div className="flex items-center justify-center h-64 mt-32">
         <div className="relative">
@@ -41,9 +48,70 @@ export const EmptyState = () => (
 );
 
 
-export const StatsRow = ({ label, value }) => (
-    <div className="flex justify-between items-center">
-        <span className="text-sm text-gray-400 ">{label}</span>
-        <span className="text-sm font-semibold text-white">{value}</span>
-    </div>
-);
+export const durationOptions = [
+    // { label: 'Flexible', value: 'flexible' },
+    { label: '1 Week', value: '7' },
+    { label: '2 Weeks', value: '14' },
+    { label: '1 Month', value: '30' },
+    { label: '3 Months', value: '90' },
+    { label: '6 Months', value: '180' },
+    { label: '1 Year', value: '365' },
+];
+
+export const aprOptions = [
+    { label: '5%', value: '5' },
+    { label: '10%', value: '10' },
+    { label: '15%', value: '15' },
+    { label: '20%', value: '20' },
+];
+
+
+
+
+// Converts seconds to a human-readable format (days, hours, minutes, seconds)
+const formatTime = (seconds) => {
+    const days = Math.floor(seconds / (24 * 60 * 60));
+    seconds %= 24 * 60 * 60;
+    const hours = Math.floor(seconds / (60 * 60));
+    seconds %= 60 * 60;
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+};
+
+const formatTimeInDays = (seconds) => {
+    const days = Math.floor(seconds / (24 * 3600)); // Calculate total days
+    seconds %= (24 * 3600); // Remaining seconds after calculating days
+    const hours = Math.floor(seconds / 3600); // Calculate remaining hours
+    seconds %= 3600; // Remaining seconds after calculating hours
+    const minutes = Math.floor(seconds / 60); // Calculate remaining minutes
+    seconds %= 60; // Remaining seconds
+
+    // Create the formatted string
+    let timeString = '';
+    if (days > 0) {
+        timeString += `${days} day${days > 1 ? 's' : ''}`;
+    }
+    if (hours > 0) {
+        if (timeString) timeString += ', ';
+        timeString += `${hours} hour${hours > 1 ? 's' : ''}`;
+    }
+    if (minutes > 0) {
+        if (timeString) timeString += ', ';
+        timeString += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+    }
+    if (seconds > 0) {
+        if (timeString) timeString += ' and ';
+        timeString += `${seconds} second${seconds > 1 ? 's' : ''}`;
+    }
+
+    return timeString;
+};
+
+
+// Converts epoch time (seconds) into a human-readable date
+const formatEpoch = (epochTime) => {
+    const date = new Date(epochTime * 1000); // Convert seconds to milliseconds
+    return date.toLocaleString(); // Format date in a human-readable format
+};

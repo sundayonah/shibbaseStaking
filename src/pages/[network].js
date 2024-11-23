@@ -4,10 +4,10 @@ import { useRouter } from 'next/router';
 
 export default function NetworkPage() {
 
- const router = useRouter();
-   const { shibAddress, token } = router.query;
+  const router = useRouter();
+  const { shibAddress, token } = router.query;
 
-   
 
- return <SingleNetwork shibAddress={shibAddress} token={token} />;
+
+  return <SingleNetwork shibAddress={shibAddress} token={token} />;
 }
