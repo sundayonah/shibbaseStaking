@@ -197,8 +197,6 @@ export const StakingContextProvider = ({ children }) => {
                console.warn("Log parsing failed:", err);
             }
          }
-
-
          toast.success("Stake created successfully!");
 
          return {
@@ -371,14 +369,14 @@ export const StakingContextProvider = ({ children }) => {
       try {
          // First get all stakes
          const stakes = await fetchPastStakesWithDetails();
-         console.log(stakes, "stakes stakes")
+         // console.log(stakes, "stakes stakes")
 
          // Then fetch user info for all stakes
          const userInfo = await fetchAllUserStakeInfo(
             stakes.map(stake => stake.shibaseStake),
             address
          );
-         console.log(userInfo, "user info with past stakes")
+         // console.log(userInfo, "user info with past stakes")
 
          // Combine the data
          return stakes.map(stake => ({
@@ -433,7 +431,7 @@ export const StakingContextProvider = ({ children }) => {
          setIsLoading(true);
 
          const userInfoWithPastEvents = await fetchStakesWithUserInfo()
-         console.log(userInfoWithPastEvents, "user Info With Past Events ✔️")
+         // console.log(userInfoWithPastEvents, "user Info With Past Events ✔️")
 
          setCreatedShibbase(userInfoWithPastEvents);
 

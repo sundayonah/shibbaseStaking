@@ -66,6 +66,9 @@ const SingleNetwork = ({ shibAddress, token }) => {
          return;
       }
 
+      // calculate profitPool
+
+
       setClaimLoading(true);
 
       setNoProfitYet(false);
@@ -73,6 +76,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
       try {
          let tx;
          if (profitPool == 0) {
+
             setNoProfitYet(true);
             setTimeout(() => {
                setNoProfitYet(false);
