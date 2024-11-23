@@ -65,19 +65,21 @@ const NetworkList = () => {
   return (
     <div className="container mx-auto px-4 py-8 mt-24">
       <Toaster />
-      <div className="flex justify-end mb-8">
-        <CreateStakeModal />
-      </div>
 
       {createdShibbase.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" data-aos="fade-up"
-          data-aos-duration="3000">
-          {createdShibbase.map((network) => (
-            <NetworkCard key={network.shibaseStake} network={network} />
-          ))}
-        </div>
+        <>
+          <div className="flex justify-end mb-8">
+            <CreateStakeModal />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" data-aos="fade-up"
+            data-aos-duration="3000">
+            {createdShibbase.map((network) => (
+              <NetworkCard key={network.shibaseStake} network={network} />
+            ))}
+          </div>
+        </>
       )}
 
     </div>

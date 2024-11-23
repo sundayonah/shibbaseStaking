@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useRef } from 'react';
-import { useAccount, useConnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useNetwork, useSwitchNetwork } from 'wagmi';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { ethers } from 'ethers';
 
@@ -25,21 +25,68 @@ export const StakingContextProvider = ({ children }) => {
       connector: new InjectedConnector(),
    });
 
+   const { chain } = useNetwork();
+   const { switchNetwork } = useSwitchNetwork();
+   // Base Sepolia testnet
+   const REQUIRED_CHAIN_ID = 84532;
+
 
    // testnet
    const shibaseContractAddress = "0x34BA159A08773127b3522b7819c6A7Cab9CDf8f6"
    // const shibaseContractAddress = "0xaf2e951d9a4BF8d74e594eA8f10D04c58314d520"
+
+   const subscriptionRef = useRef();
 
 
    /// state variables
    const [createdShibbase, setCreatedShibbase] = useState([]);
    const [isLoading, setIsLoading] = useState(true);
    const [isCreating, setIsCreating] = useState(false);
+   const [isApproving, setIsApproving] = useState(false);
 
    const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
 
    const provider = new ethers.getDefaultProvider(alchemyApiKey);
 
+
+   // const getContractInstance = async () => {
+   //    if (typeof window !== "undefined" && window.ethereum) {
+   //       signer = await provider.getSigner();
+   //       contractInstance = new ethers.Contract(shibaseContractAddress, shibaseAbi, signer);
+   //       return contractInstance;
+   //    } else {
+   //       throw new Error("Ethereum wallet not found. Please install MetaMask.");
+   //    }
+   // };
+
+
+
+   // Approve Logic
+
+
+   // const approveToken = async (tokenAddress, amount) => {
+   //    try {
+   //       setIsApproving(true);
+   //       if (!window.ethereum) throw new Error('MetaMask is not detected.');
+
+   //       const signer = await provider.getSigner();
+
+   //       const tokenContract = new ethers.Contract(tokenAddress, approveAbi, signer);
+   //       const approveTx = await tokenContract.approve(shibaseContractAddress, amount);
+
+   //       await approveTx.wait(); // Wait for the transaction to be mined
+   //       console.log("Approval confirmed");
+
+   //       toast.success("Token is approved for staking!");
+   //       return true;
+   //    } catch (error) {
+   //       console.error('Approval Error:', error);
+   //       toast.error("Token approval failed. Please try again.");
+   //       return false;
+   //    } finally {
+   //       setIsApproving(false);
+   //    }
+   // };
 
    const CreateStake = async () => {
       const { tokenAddress, minimumStake, apr, duration } = stakeParams;
@@ -166,9 +213,9 @@ export const StakingContextProvider = ({ children }) => {
    };
 
    const fetchPastStakesWithDetails = async () => {
+      const provider = new ethers.getDefaultProvider(alchemyApiKey);
+      const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
       try {
-         const provider = new ethers.getDefaultProvider(alchemyApiKey);
-         const factoryContract = new ethers.Contract(shibaseContractAddress, shibaseAbi, provider);
 
          const filter = factoryContract.filters.ShibaseStakeCreated();
          const events = await factoryContract.queryFilter(filter, "earliest", "latest");
@@ -242,9 +289,7 @@ export const StakingContextProvider = ({ children }) => {
    };
 
    // Function to fetch user info for a specific stake
-   const fetchUserStakeInfo = async (stakeAddress, userAddress) => {
-      const provider = new ethers.getDefaultProvider(alchemyApiKey);
-
+   const fetchUserStakeInfo = async (stakeAddress, userAddress, provider) => {
       try {
          // Create stake contract instance
          const stakeContract = new ethers.Contract(
@@ -289,78 +334,6 @@ export const StakingContextProvider = ({ children }) => {
    };
 
 
-
-   // Function to fetch user info for multiple stakes
-   const fetchAllUserStakeInfo = async (stakeAddresses, userAddress) => {
-      const userStakeInfo = await Promise.all(
-         stakeAddresses.map(address => fetchUserStakeInfo(address, userAddress, provider))
-      );
-      return userStakeInfo.filter(Boolean); // Remove null or invalid results
-   };
-
-   const fetchStakesWithUserInfo = async () => {
-      try {
-         // First get all stakes
-         const stakes = await fetchPastStakesWithDetails();
-         const userInfo = await fetchAllUserStakeInfo(
-            stakes.map(stake => stake.shibaseStake),
-            address
-         );
-         return stakes.map(stake => ({
-            ...stake,
-            userInfo: userInfo.find(info => info?.stakeAddress === stake.shibaseStake) || null
-         }));
-      } catch (error) {
-         console.error("Error fetching stakes with user info:", error);
-         throw error;
-      }
-   };
-
-   const listenForNewStakes = () => {
-      const provider = new ethers.getDefaultProvider(alchemyApiKey);
-
-      const factoryContract = new ethers.Contract(
-         shibaseContractAddress,
-         shibaseAbi,
-         provider
-      );
-
-      factoryContract.on("ShibaseStakeCreated", async (shibaseStake, owner, apr, duration, min, token) => {
-         const newStake = {
-            shibaseStake,
-            owner,
-            apr: apr.toString(),
-            duration: duration.toString(),
-            min: ethers.utils.formatEther(min),
-            token,
-         };
-         console.log(newStake, "new Stake")
-
-
-         // Immediately fetch the user info for this new stake
-         const newStakesWithUserInfo = await fetchStakesWithUserInfo();
-         // console.log(newStakesWithUserInfo, "new Stakes With User Info")
-
-         // Update state with the new stakes data
-         setCreatedShibbase(prevState => [...prevState, ...newStakesWithUserInfo]);
-      });
-   };
-
-   // Fetch initial stakes when component mounts
-   useEffect(() => {
-      const fetchData = async () => {
-         const stakesWithUserInfo = await fetchStakesWithUserInfo();
-         // console.log(stakesWithUserInfo, "stakes With User Info")
-         setCreatedShibbase(stakesWithUserInfo);
-         setIsLoading(false);
-      };
-
-      fetchData();
-
-      // Start listening for new stakes
-      listenForNewStakes();
-   }, []);
-
    // // Function to fetch user info for multiple stakes
    // const fetchAllUserStakeInfo = async (stakeAddresses, userAddress) => {
    //    try {
@@ -392,7 +365,31 @@ export const StakingContextProvider = ({ children }) => {
    //    }
    // };
 
+   // Function to fetch user info for multiple stakes
+   const fetchAllUserStakeInfo = async (stakeAddresses, userAddress) => {
+      const userStakeInfo = await Promise.all(
+         stakeAddresses.map(address => fetchUserStakeInfo(address, userAddress, provider))
+      );
+      return userStakeInfo.filter(Boolean); // Remove null or invalid results
+   };
 
+   const fetchStakesWithUserInfo = async () => {
+      try {
+         // First get all stakes
+         const stakes = await fetchPastStakesWithDetails();
+         const userInfo = await fetchAllUserStakeInfo(
+            stakes.map(stake => stake.shibaseStake),
+            address
+         );
+         return stakes.map(stake => ({
+            ...stake,
+            userInfo: userInfo.find(info => info?.stakeAddress === stake.shibaseStake) || null
+         }));
+      } catch (error) {
+         console.error("Error fetching stakes with user info:", error);
+         throw error;
+      }
+   };
 
    // const listenForNewStakes = () => {
    //    const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
@@ -419,6 +416,48 @@ export const StakingContextProvider = ({ children }) => {
    // };
 
    // Listen for new stakes created and update state
+   const listenForNewStakes = () => {
+      const factoryContract = new ethers.Contract(
+         shibaseContractAddress,
+         shibaseAbi,
+         provider
+      );
+
+      factoryContract.on("ShibaseStakeCreated", async (shibaseStake, owner, apr, duration, min, token) => {
+         const newStake = {
+            shibaseStake,
+            owner,
+            apr: apr.toString(),
+            duration: duration.toString(),
+            min: ethers.utils.formatEther(min),
+            token,
+         };
+         console.log(newStake, "new Stake")
+
+
+         // Immediately fetch the user info for this new stake
+         const newStakesWithUserInfo = await fetchStakesWithUserInfo();
+         console.log(newStakesWithUserInfo, "new Stakes With User Info")
+
+         // Update state with new stakes data
+         setCreatedShibbase(prevState => [...prevState, ...newStakesWithUserInfo]);
+      });
+   };
+
+   // Fetch initial stakes when component mounts
+   useEffect(() => {
+      const fetchData = async () => {
+         const stakesWithUserInfo = await fetchStakesWithUserInfo();
+         console.log(stakesWithUserInfo, "stakes With User Info")
+         setCreatedShibbase(stakesWithUserInfo);
+         setIsLoading(false);
+      };
+
+      fetchData();
+
+      // Start listening for new stakes
+      listenForNewStakes();
+   }, []);
 
 
    // useEffect(() => {
@@ -471,6 +510,8 @@ export const StakingContextProvider = ({ children }) => {
          value={{
             shibaseContractAddress,
             shibaseAbi,
+            isApproving,
+            // approveToken,
             stakeParams,
             setStakeParams,
             CreateStake,
