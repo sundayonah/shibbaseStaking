@@ -13,7 +13,11 @@ import { Label } from '@/components/ui/label';
 import { StakingContext } from '@/Context/StakeContext';
 import toast from 'react-hot-toast';
 import { ethers } from 'ethers';
-import { aprOptions, durationOptions } from '@/lib/helper';
+import {
+   aprOptions,
+   durationOptions,
+   getMinimumStakeForDuration,
+} from '@/lib/helper';
 
 export function CreateStakeModal() {
    const {
@@ -31,6 +35,7 @@ export function CreateStakeModal() {
    const [isOpen, setIsOpen] = useState(false);
    const [customApr, setCustomApr] = useState('');
    const [selectedApr, setSelectedApr] = useState('');
+   const [selectedDuration, setSelectedDuration] = useState(null);
 
    const handleSubmit = async (e) => {
       e.preventDefault();
@@ -45,6 +50,7 @@ export function CreateStakeModal() {
          }
       }
 
+      console.log(stakeParams, ' stake parameters');
       if (
          !stakeParams.tokenAddress ||
          !stakeParams.minimumStake ||
@@ -73,19 +79,37 @@ export function CreateStakeModal() {
       return 'Create Stake';
    };
 
+   // When a new option is selected
    const handleAprChange = (value) => {
-      if (value === 'custom') {
-         setSelectedApr('');
-         setCustomApr('');
+      if (value === 'input') {
+         setSelectedApr('input');
+         if (!customApr) {
+            setCustomApr('');
+         }
       } else {
          setSelectedApr(value);
+         setCustomApr('');
          setStakeParams({ ...stakeParams, apr: value });
       }
    };
 
+   // When typing in the input input
    const handleCustomAprChange = (value) => {
       setCustomApr(value);
       setStakeParams({ ...stakeParams, apr: value });
+   };
+
+   const handleDurationChange = (e) => {
+      const { name, value } = e.target;
+
+      if (name === 'duration') {
+         const durationOption = durationOptions.find(
+            (option) => option.value === value
+         );
+         // setSelectedDuration(durationOption);
+      }
+
+      setStakeParams((prev) => ({ ...prev, [name]: value }));
    };
 
    // Clear stakeParams and close modal when dialog is closed
@@ -175,27 +199,6 @@ export function CreateStakeModal() {
                   />
                </div>
 
-               {/* <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="apr" className="text-right text-gray-300">
-                     APR (%)
-                  </Label>
-                  <Input
-                     id="apr"
-                     type="number"
-                     placeholder="5"
-                     className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
-                     value={stakeParams.apr}
-                     onChange={(e) =>
-                        setStakeParams({
-                           ...stakeParams,
-                           apr: e.target.value,
-                        })
-                     }
-                     required
-                     step="0.1"
-                     min="0"
-                  />
-               </div> */}
                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="apr" className="text-right text-gray-300">
                      APR (%)
@@ -205,7 +208,7 @@ export function CreateStakeModal() {
                         id="apr"
                         name="apr"
                         className="w-full bg-slate-800 py-2 px-2 border-slate-700 text-white placeholder:text-gray-500 rounded-md"
-                        value={selectedApr || stakeParams.apr}
+                        value={selectedApr === 'input' ? 'input' : selectedApr}
                         onChange={(e) => handleAprChange(e.target.value)}
                         required
                      >
@@ -215,16 +218,18 @@ export function CreateStakeModal() {
                               {option.label}
                            </option>
                         ))}
-                        <option value="custom">Other</option>
                      </select>
-                     {selectedApr === 'custom' && (
-                        <Input
+
+                     {selectedApr === 'input' && (
+                        <input
                            id="customApr"
                            type="number"
-                           placeholder="Enter custom APR"
-                           className="col-span-3 bg-slate-800 border-slate-700 text-white placeholder:text-gray-500"
+                           placeholder="Enter input APR"
+                           className="mt-2 w-full bg-slate-800 py-2 px-2 border-slate-700 text-white placeholder:text-gray-500 rounded-md"
                            value={customApr}
-                           onChange={handleCustomAprChange}
+                           onChange={(e) =>
+                              handleCustomAprChange(e.target.value)
+                           }
                            step="0.1"
                            min="0"
                            required
@@ -232,6 +237,7 @@ export function CreateStakeModal() {
                      )}
                   </div>
                </div>
+
                <div className="grid grid-cols-4 items-center gap-4">
                   <Label
                      htmlFor="duration"
@@ -245,12 +251,7 @@ export function CreateStakeModal() {
                         name="duration"
                         className="w-full bg-slate-800 py-2 px-2 border-slate-700 text-white placeholder:text-gray-500 rounded-md"
                         value={stakeParams.duration}
-                        onChange={(e) =>
-                           setStakeParams({
-                              ...stakeParams,
-                              duration: e.target.value,
-                           })
-                        }
+                        onChange={handleDurationChange}
                         required
                      >
                         <option value="">Select Duration</option>

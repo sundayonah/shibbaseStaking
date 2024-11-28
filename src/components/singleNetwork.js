@@ -14,13 +14,9 @@ import 'aos/dist/aos.css';
 const SingleNetwork = ({ shibAddress, token }) => {
 
    const {
-      totalStaker,
-      totalAmountStake,
-      walletBalance,
       calculateReward,
       ethBalance,
       createdShibbase,
-      provider
    } = useContext(StakingContext);
 
    const { address } = useAccount();
@@ -39,7 +35,6 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
    // Find the specific network details
    const findNetworkDetails = createdShibbase.find(network => network.shibaseStake === shibAddress);
-
 
    ///// CLAIM F(x) ///////////
    const Claim = async () => {
@@ -67,7 +62,10 @@ const SingleNetwork = ({ shibAddress, token }) => {
       }
 
       // calculate profitPool
+      // const profitPool1 = await calculateRewards(shibAddress, token);
+      // console.log(profitPool1, " profit /////////////////")
 
+      const profitPool = 2
 
       setClaimLoading(true);
 
@@ -187,7 +185,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
 
          const stringAmount = _amount.toString();
 
-         console.log(stringAmount)
+         // console.log(stringAmount)
 
          const tx = await createdShibbaseInstance.stake(stringAmount, {
             gasLimit: 700000,
@@ -311,7 +309,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
          const balance = await contractInstance.balanceOf(address);
          const stringBalance = ethers.formatEther(balance.toString());
          const formattedBalance = parseFloat(stringBalance).toFixed(3);
-         console.log(formattedBalance)
+         // console.log(formattedBalance)
 
          // Check if the balance is less than 1 or if the input amount is greater than the balance
          if (parseFloat(formattedBalance) < 1 || parseFloat(stakeAmount) > parseFloat(formattedBalance)) {

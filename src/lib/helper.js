@@ -48,25 +48,37 @@ export const EmptyState = () => (
 );
 
 
+// Hi Gm Sunday, can you make these adjusments ?
+//     Flexibel   Free
+// 0.025 ET 1 Week
+// 0.05ETH 2 weeks
+// 0.1 ETH  1 month
+// 0.3 ETH 3 month
+// 0.5 ETH 6 Months
+
 export const durationOptions = [
-    // { label: 'Flexible', value: 'flexible' },
-    { label: '1 Week', value: '7' },
-    { label: '2 Weeks', value: '14' },
-    { label: '1 Month', value: '30' },
-    { label: '3 Months', value: '90' },
-    { label: '6 Months', value: '180' },
-    { label: '1 Year', value: '365' },
+    { label: 'Free', value: '3', min: '0' },
+    { label: '1 Week', value: '7', min: '0.025' },
+    { label: '2 Weeks', value: '14', min: '0.05' },
+    { label: '1 Month', value: '30', min: '0.1' },
+    { label: '3 Months', value: '90', min: '0.3' },
+    { label: '6 Months', value: '180', min: '0.5' },
 ];
+
+export const getMinimumStakeForDuration = (durationValue) => {
+    const selectedOption = durationOptions.find(
+        (option) => option.value === durationValue
+    );
+    return selectedOption ? selectedOption.min : '0';
+};
 
 export const aprOptions = [
     { label: '5%', value: '5' },
     { label: '10%', value: '10' },
     { label: '15%', value: '15' },
     { label: '20%', value: '20' },
+    { label: 'other', value: 'input' },
 ];
-
-
-
 
 // Converts seconds to a human-readable format (days, hours, minutes, seconds)
 const formatTime = (seconds) => {
