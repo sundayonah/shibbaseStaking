@@ -272,13 +272,119 @@ const SingleNetwork = ({ shibAddress, token }) => {
    };
 
    ///// APPROVE F(x) ///////////
+   // const Approved = async () => {
+   //    // console.log('hello approve');
+   //    setApprovedLoading(true);
+   //    // setLessAmount(false);
+
+   //    if (address === undefined) {
+   //       toast.success(`Please Connect Your Wallet.`, {
+   //          duration: 4000,
+   //          position: 'top-right',
+   //          icon: '❌',
+   //          style: {
+   //             color: '#fff',
+   //             background: `linear-gradient(to right, #000f58, #000624)`,
+   //          },
+   //       });
+   //       return;
+   //    }
+   //    try {
+   //       const provider = new ethers.BrowserProvider(window.ethereum);
+   //       const signer = await provider.getSigner();
+   //       // const instanceContract = getContract();
+   //       const contractInstance = new ethers.Contract(
+   //          token,
+   //          approveAbi,
+   //          signer
+   //       );
+
+   //       //////////////////////////////
+   //       const balance = await contractInstance.balanceOf(address);
+   //       const stringBalance = ethers.formatEther(balance.toString());
+   //       const formattedBalance = parseFloat(stringBalance).toFixed(3);
+   //       // console.log(formattedBalance)
+
+   //       // Check if the balance is less than 1 or if the input amount is greater than the balance
+   //       if (parseFloat(formattedBalance) < 1 || parseFloat(stakeAmount) > parseFloat(formattedBalance)) {
+   //          let errorMessage = '';
+   //          if (parseFloat(formattedBalance) === 0) {
+   //             errorMessage = 'Insufficient funds.';
+   //          } else {
+   //             errorMessage = `Insufficient funds or input amount exceeds available balance. Please stake at least ${formattedBalance} ${findNetworkByAddress?.symbol}.`;
+   //          }
+
+   //          toast.error(errorMessage, {
+   //             duration: 4000,
+   //             position: 'top-right',
+   //             icon: '❌',
+   //             style: {
+   //                color: '#fff',
+   //                background: `linear-gradient(to right, #000f58, #000624)`,
+   //             },
+   //          });
+   //          setApprovedLoading(false);
+   //          return; // Exit the function early
+   //       }
+
+   //       // Convert the input stakeAmount to Ether
+   //       const _amount = ethers.parseEther(stakeAmount, 'ether');
+   //       const amountToString = _amount.toString();
+
+   //       let tx;
+
+   //       tx = await contractInstance.approve(
+   //          shibAddress,
+   //          amountToString,
+   //          {
+   //             gasLimit: 5000000,
+   //             gasPrice: ethers.parseUnits('15', 'gwei'),
+   //          }
+   //       );
+
+   //       // setIsApproved(true);
+   //       const receipt = await tx.wait();
+   //       //   check if the transaction was successful
+   //       if (receipt.status === 1) {
+   //          toast.success(`Token Approved.`, {
+   //             duration: 4000,
+   //             position: 'top-right',
+   //             icon: '✅',
+   //             style: {
+   //                color: '#fff',
+   //                background: `linear-gradient(to right, #000f58, #000624)`,
+   //             },
+   //          });
+   //          setIsApproved(true);
+   //          setApprovedLoading(false);
+   //       } else {
+   //       }
+   //       // }
+
+   //    } catch (error) {
+   //       console.error(error);
+
+   //       setApprovedLoading(false);
+   //       if (error.code === 4001) {
+   //          // User cancelled the transaction, set loading to false
+   //          setApprovedLoading(false);
+   //       } else {
+   //          // Handle other transaction errors
+   //          console.error(error);
+   //       }
+   //       setApprovedLoading(false);
+   //    }
+   //    setApprovedLoading(false);
+
+
+   // };
+
+
    const Approved = async () => {
-      // console.log('hello approve');
       setApprovedLoading(true);
-      // setLessAmount(false);
 
       if (address === undefined) {
-         toast.success(`Please Connect Your Wallet.`, {
+         toast.error(`Please Connect Your Wallet.`, {
             duration: 4000,
             position: 'top-right',
             icon: '❌',
@@ -287,17 +393,13 @@ const SingleNetwork = ({ shibAddress, token }) => {
                background: `linear-gradient(to right, #000f58, #000624)`,
             },
          });
+         setApprovedLoading(false);
          return;
       }
 
       try {
-
          const provider = new ethers.BrowserProvider(window.ethereum);
-
-
          const signer = await provider.getSigner();
-
-         // const instanceContract = getContract();
 
          const contractInstance = new ethers.Contract(
             token,
@@ -305,20 +407,16 @@ const SingleNetwork = ({ shibAddress, token }) => {
             signer
          );
 
-         //////////////////////////////
+         // Check token balance
          const balance = await contractInstance.balanceOf(address);
          const stringBalance = ethers.formatEther(balance.toString());
          const formattedBalance = parseFloat(stringBalance).toFixed(3);
-         // console.log(formattedBalance)
 
-         // Check if the balance is less than 1 or if the input amount is greater than the balance
+         // Validate balance and stake amount
          if (parseFloat(formattedBalance) < 1 || parseFloat(stakeAmount) > parseFloat(formattedBalance)) {
-            let errorMessage = '';
-            if (parseFloat(formattedBalance) === 0) {
-               errorMessage = 'Insufficient funds.';
-            } else {
-               errorMessage = `Insufficient funds or input amount exceeds available balance. Please stake at least ${formattedBalance} ${findNetworkByAddress?.symbol}.`;
-            }
+            const errorMessage = parseFloat(formattedBalance) === 0
+               ? 'Insufficient funds.'
+               : `Insufficient funds or input amount exceeds available balance. Please stake at most ${formattedBalance} ${findNetworkByAddress?.symbol}.`;
 
             toast.error(errorMessage, {
                duration: 4000,
@@ -330,29 +428,56 @@ const SingleNetwork = ({ shibAddress, token }) => {
                },
             });
             setApprovedLoading(false);
-            return; // Exit the function early
+            return;
          }
 
-         // Convert the input stakeAmount to Ether
-         const _amount = ethers.parseEther(stakeAmount, 'ether');
-         const amountToString = _amount.toString();
+         // Convert stake amount to Wei
+         const _amount = ethers.parseEther(stakeAmount);
 
+         // Check current allowance
+         const currentAllowance = await contractInstance.allowance(address, shibAddress);
+         const formattedCurrentAllowance = ethers.formatEther(currentAllowance);
+         console.log(formattedCurrentAllowance, "Allowance:")
+
+         // Decide on approve strategy
          let tx;
+         if (parseFloat(formattedCurrentAllowance) >= parseFloat(stakeAmount)) {
+            // Sufficient allowance already exists
+            toast.success(`Sufficient allowance exists: ${formattedCurrentAllowance}`, {
+               duration: 4000,
+               position: 'top-right',
+               icon: '✅',
+            });
+            setIsApproved(true);
+            setApprovedLoading(false);
+            return;
+         } else if (parseFloat(formattedCurrentAllowance) > 0) {
+            // If some allowance exists but is less than needed, reset to 0 first
+            tx = await contractInstance.approve(
+               shibAddress,
+               0,
+               {
+                  gasLimit: 5000000,
+                  gasPrice: ethers.parseUnits('15', 'gwei'),
+               }
+            );
+            await tx.wait();
+         }
 
+         // Approve the exact amount needed
          tx = await contractInstance.approve(
             shibAddress,
-            amountToString,
+            _amount,
             {
                gasLimit: 5000000,
                gasPrice: ethers.parseUnits('15', 'gwei'),
             }
          );
 
-         // setIsApproved(true);
          const receipt = await tx.wait();
-         //   check if the transaction was successful
+
          if (receipt.status === 1) {
-            toast.success(`Token Approved.`, {
+            toast.success(`Token Approval Successful: ${stakeAmount}`, {
                duration: 4000,
                position: 'top-right',
                icon: '✅',
@@ -362,27 +487,33 @@ const SingleNetwork = ({ shibAddress, token }) => {
                },
             });
             setIsApproved(true);
-            setApprovedLoading(false);
          } else {
+            toast.error('Token Approval Failed', {
+               duration: 4000,
+               position: 'top-right',
+               icon: '❌',
+            });
          }
-         // }
 
       } catch (error) {
          console.error(error);
 
-         setApprovedLoading(false);
          if (error.code === 4001) {
-            // User cancelled the transaction, set loading to false
-            setApprovedLoading(false);
+            toast.error('Transaction Cancelled', {
+               duration: 4000,
+               position: 'top-right',
+               icon: '❌',
+            });
          } else {
-            // Handle other transaction errors
-            console.error(error);
+            toast.error(`Approval Error: ${error.message}`, {
+               duration: 4000,
+               position: 'top-right',
+               icon: '❌',
+            });
          }
+      } finally {
          setApprovedLoading(false);
       }
-      setApprovedLoading(false);
-
-
    };
 
 
@@ -425,7 +556,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
                      <div className="flex justify-between items-center pt-5">
                         <span>
                            <h2>{findNetworkDetails?.apr} % Daily</h2>
-                           <span className="text-sm  text-gray-500">APR</span>
+                           <span className="text-sm  text-gray-500">APY</span>
                         </span>
                         <span className="inline-block h-12 border-r border-solid border-gray-600"></span>
                         <span>
@@ -552,7 +683,7 @@ const SingleNetwork = ({ shibAddress, token }) => {
                         <p className="text-sm">{calculateReward} {findNetworkDetails?.symbol}</p>
                      </div>
                      <div className="flex justify-between items-center py-2 px-4">
-                        <span className="text-sm text-gray-500">Staking APR</span>
+                        <span className="text-sm text-gray-500">Staking APY</span>
                         <p className="text-sm">0.5% daily</p>
                      </div>
                   </div>

@@ -5,26 +5,11 @@
 body {
    color: #fff;
    background: linear-gradient(to right, #000f58, #000624);
+   /* background: bg-gradient-to-b from-blue-80 to-white; */
 }
-/* 
-.bgimage {
-   background-image: url('/monie.jpg');
-   background-size: cover;
-   background-position: center;
-   height: 100vh;
-   opacity: 0.25;
-   z-index: 0;
-} */
-
-/* backgroundImage: {
-        'hero-pattern': "url('/img/hero-pattern.svg')",
-        'footer-texture': "url('/img/footer-texture.png')",
-      } */
-
-/* <div class="bg-[url('/img/hero-pattern.svg')]"> */
 
 @layer base {
-  :root {
+   :root {
       --radius: 0.5rem;
    }
 }

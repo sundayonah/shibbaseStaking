@@ -3,11 +3,10 @@ import Link from 'next/link';
 const Header = () => {
 
    return (
-      <main className="w-full flex justify-between  items-center fixed top-0  bg-opacity-10 backdrop-blur-md shadow-lg h-16 z-20">
-         <div className="flex w-full p-4 justify-between items-center  shadow-custom">
+      <main className="w-full flex justify-between items-center fixed top-0  bg-opacity-10 backdrop-blur-md shadow-lg h-16 z-20">
+         <div className="flex w-full p-4 justify-between items-center shadow-custom">
             <div className=" pr-2">
                <Link href='/'>
-
                   <Image src="/shibase.png" alt="logo-image" className="h-12 w-12" width={150} height={100} />
                </Link>
             </div>
@@ -25,5 +24,4 @@ const Header = () => {
       </main>
    );
 };
-
 export default Header;

@@ -12,6 +12,7 @@ import 'aos/dist/aos.css';
 
 
 
+
 const NetworkCard = ({ network }) => (
 
   <Link
@@ -29,7 +30,7 @@ const NetworkCard = ({ network }) => (
         </div>
         <div className="mt-4 space-y-2">
           <StatsRow label="Total Stake" value={network.totalStaked} />
-          <StatsRow label="APR" value={`${network.apr}%`} />
+          <StatsRow label="APY" value={`${network.apr}%`} />
           <StatsRow label="Total Stakers" value={network.totalStaker} />
           <StatsRow label="Minimum Stake" value={network.min} />
           <StatsRow label="Duration (Days)" value={FormatDateTime(network.duration)} />

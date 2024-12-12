@@ -3,16 +3,14 @@ import Header from '@/components/header';
 import '@/styles/globals.css';
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
 import { createConfig, http } from 'wagmi'
-import { mainnet, baseSepolia } from 'wagmi/chains'
+import { mainnet, baseSepolia, bsc, base, shibarium } from 'wagmi/chains'
 import { metaMask } from 'wagmi/connectors'
 
 import { WagmiConfig } from 'wagmi';
 
-// 1. Get projectId
 const projectId = '60fa83860edbb9d7d2e1df131caa2675';
 // const projectId = process.env.NEXT_APP_PROJECTID;
 
-// 2. Create wagmiConfig
 const metadata = {
    name: 'Shibbase Staking',
    description: 'Shibbaase Staking',
@@ -20,12 +18,11 @@ const metadata = {
    icons: ['https://avatars.githubusercontent.com/u/37784886'],
 };
 
-const chains = [mainnet, baseSepolia];
+const chains = [mainnet, baseSepolia, bsc, base, shibarium];
 const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata });
 
 
-// 3. Create modal
-createWeb3Modal({ wagmiConfig, projectId, chains });
+createWeb3Modal({ wagmiConfig, projectId, chains, shibarium });
 
 export default function App({ Component, pageProps }) {
    return (

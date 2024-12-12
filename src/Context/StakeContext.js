@@ -26,12 +26,10 @@ export const StakingContextProvider = ({ children }) => {
    });
 
 
-
    // testnet
    // const shibaseContractAddress = "0x34BA159A08773127b3522b7819c6A7Cab9CDf8f6"
    const shibaseContractAddress = "0xb6BAD05d5568E53E5dCFa0EF27d92dF75104Fd1e"
 
-   const subscriptionRef = useRef();
 
 
    /// state variables
@@ -45,10 +43,8 @@ export const StakingContextProvider = ({ children }) => {
    const provider = new ethers.getDefaultProvider(alchemyApiKey);
 
 
-
    const CreateStake = async () => {
       const { tokenAddress, minimumStake, apr, duration } = stakeParams;
-      console.log(tokenAddress, minimumStake, apr, duration, " Params");
 
       try {
          setIsCreating(true);
@@ -99,14 +95,14 @@ export const StakingContextProvider = ({ children }) => {
          // Retrieve fee (`min`) for the selected duration
          const feeInEther = selectedDuration.min.toString(); // Ensure string format
          const feeInWei = ethers.parseEther(feeInEther);
-         console.log("Fee in Wei:", feeInWei.toString());
+         // console.log("Fee in Wei:", feeInWei.toString());
 
          // Convert inputs to appropriate formats
          const minStakeInWei = ethers.parseEther(minimumStake.toString());
          const aprInWei = BigInt(apr); // Ensure integer format for APR
          const stakeDuration = ConvertToEpochDuration(duration);
 
-         console.log({ minStakeInWei, })
+         // console.log({ minStakeInWei, })
 
          // Estimate gas for stake creation
          const gasEstimate = await contractInstance.createStake.estimateGas(
@@ -119,12 +115,12 @@ export const StakingContextProvider = ({ children }) => {
 
          // Add 20% buffer to gas estimate
          const gasLimit = BigInt(Math.floor(Number(gasEstimate) * 1.2));
-         console.log({
-            tokenAddress,
-            minStakeInWei,
-            aprInWei,
-            stakeDuration,
-         }, " create state parameters")
+         // console.log({
+         //    tokenAddress,
+         //    minStakeInWei,
+         //    aprInWei,
+         //    stakeDuration,
+         // }, " create state parameters")
 
          // Create stake (sending the fee as value)
          const tx = await contractInstance.createStake(
@@ -210,7 +206,8 @@ export const StakingContextProvider = ({ children }) => {
                // Fetch token name and symbol
                const [tokenName, tokenSymbol] = await Promise.all([
                   tokenContract.name(),
-                  tokenContract.symbol()
+                  tokenContract.symbol(),
+                  // tokenContract.getTokenImage()
                ]);
 
                return {
@@ -470,10 +467,8 @@ export const StakingContextProvider = ({ children }) => {
 
             // Additional logging
             console.log("Contract Address:", shibaseContractAddress);
-            console.log("User Address:", formattedAddress);
 
             const userReward = await factoryContract.calculateRewards(formattedAddress);
-            console.log(userReward.toString(), "user reward");
          } catch (error) {
             console.error("Detailed Error:", {
                name: error.name,
@@ -488,54 +483,6 @@ export const StakingContextProvider = ({ children }) => {
          calculateRewards();
       }
    }, [address])
-
-
-
-
-
-   // useEffect(() => {
-   // // const provider = new ethers.BrowserProvider(window.ethereum);
-   // const alchemyApiKey = 'https://base-sepolia.g.alchemy.com/v2/k876etRLMsoIcTpTzkkTuh3LPBTK96YZ';
-
-   // const provider = new ethers.getDefaultProvider(alchemyApiKey);
-
-
-   // const factoryContract = new ethers.Contract(
-   //    shibaseContractAddress,
-   //    shibaseAbi,
-   //    provider
-   // );
-   //    const initialize = async () => {
-   //       setIsLoading(true);
-
-   //       const userInfoWithPastEvents = await fetchStakesWithUserInfo()
-   //       // console.log(userInfoWithPastEvents, "user Info With Past Events ✔️")
-
-   //       setCreatedShibbase(userInfoWithPastEvents);
-
-   //       await provider.getLogs({
-   //          address: shibaseContractAddress,
-   //          fromBlock: '0x0',
-   //          toBlock: 'latest',
-   //       });
-
-
-   //       listenForNewStakes();
-   //       setIsLoading(false);
-   //    };
-
-   //    initialize();
-
-   //    return () => {
-   //       // Clean up event listener when component unmounts
-   //       factoryContract.removeAllListeners("ShibaseStakeCreated");
-   //    };
-   // }, []);
-
-
-
-
-   // 0x201af0e0243415B67A0D6CD1f6fCd50666bB1a6E
 
 
    return (
